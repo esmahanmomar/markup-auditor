@@ -2,4 +2,3 @@ streamlit
 PyMuPDF
 openai
 Pillow
-numpy
