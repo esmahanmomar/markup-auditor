@@ -397,7 +397,7 @@ def process_single_sheet(
   )
 
   max_retries = 5
-  backoff = 10
+  backoff = 15
   for attempt in range(max_retries):
     try:
       response = client.chat.completions.create(
@@ -410,9 +410,11 @@ def process_single_sheet(
       )
       return sheet_index, response.choices[0].message.content
     except Exception as e:
-      if attempt < max_retries - 1:
+      if "rate_limit" in str(e).lower() or "429" in str(e):
         time.sleep(backoff)
-        backoff *= 1.5
+        backoff *= 2  # Exponential backoff for rate limit handling
+      elif attempt < max_retries - 1:
+        time.sleep(5)
       else:
         raise e
 
@@ -535,7 +537,8 @@ if run_audit and rev_a_file and rev_b_file:
     results_dict = {}
     sheet_names = [f"Sheet {i+1}" for i in range(total_pages)]
 
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    # Sequential processing (max_workers=1) prevents rate limit exhaustion
+    with ThreadPoolExecutor(max_workers=1) as executor:
       future_to_index = {}
       for i in range(total_pages):
         f = executor.submit(
@@ -550,7 +553,7 @@ if run_audit and rev_a_file and rev_b_file:
             api_key,
         )
         future_to_index[f] = i
-        time.sleep(0.5)
+        time.sleep(2)  # Short pause between sheet dispatches
 
       completed_count = 0
       for future in as_completed(future_to_index):
@@ -609,8 +612,8 @@ if run_audit and rev_a_file and rev_b_file:
         )
         missed_summary = res_missed.choices[0].message.content
         break
-      except Exception:
-        time.sleep(10)
+      except Exception as e:
+        time.sleep(12)
 
     addressed_summary = ""
     for attempt in range(5):
@@ -637,8 +640,8 @@ if run_audit and rev_a_file and rev_b_file:
         )
         addressed_summary = res_addressed.choices[0].message.content
         break
-      except Exception:
-        time.sleep(10)
+      except Exception as e:
+        time.sleep(12)
 
     loader_placeholder.empty()
 
