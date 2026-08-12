@@ -20,18 +20,17 @@ st.markdown(
    <style>
        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 
-       /* 1. Global Baseline (Excluding spans to protect material icons) */
+       /* 1. Base Typography (Strictly exclude spans and material icon tags) */
        html, body, .stApp, [data-testid="stSidebar"], 
        input, textarea, select, p, h1, h2, h3, h4, h5, h6, label, div {
            font-family: 'Lora', 'Georgia', 'Times New Roman', serif !important;
        }
 
-       /* Protect Material Icons from font overrides */
-       [data-testid="stIconMaterial"], 
+       /* Restore Material Icons globally for Streamlit */
+       span[data-testid="stIconMaterial"],
        [data-testid="stIcon"],
        [data-baseweb="icon"],
-       [data-testid="stFileUploaderDropzone"] span[aria-hidden="true"],
-       [data-testid="stFileUploaderDropzone"] i {
+       i {
            font-family: "Material Symbols Outlined", "Material Icons" !important;
        }
 
@@ -77,7 +76,7 @@ st.markdown(
            font-family: 'Lora', 'Georgia', serif !important;
        }
 
-       /* 4. Pure Light File Uploader & Browse Button */
+       /* 4. Streamlit File Uploader Overrides */
        [data-testid="stFileUploader"] {
            background-color: transparent !important;
        }
@@ -86,7 +85,10 @@ st.markdown(
            background-color: #ffffff !important;
            border: 1.5px dashed #cbd5e1 !important;
            border-radius: 8px !important;
-           padding: 16px !important;
+           padding: 18px 24px !important;
+           display: flex !important;
+           align-items: center !important;
+           gap: 12px !important;
        }
 
        section[data-testid="stFileUploaderDropzone"]:hover {
@@ -94,13 +96,28 @@ st.markdown(
            background-color: #f8fafc !important;
        }
 
-       /* Target the Browse Files Button specifically inside Dropzone */
+       /* REMOVE EXTRA TEXT ("200MB per file • PDF") */
+       [data-testid="stFileUploaderDropzoneInstructions"],
+       [data-testid="stFileUploaderDropzone"] small,
+       [data-testid="stFileUploaderDropzone"] [data-testid="stMarkdownContainer"] {
+           display: none !important;
+       }
+
+       /* Make Browse / Add Button Roomier and Bigger */
        [data-testid="stFileUploaderDropzone"] button {
            background-color: #f1f5f9 !important;
            color: #0f172a !important;
            border: 1px solid #cbd5e1 !important;
            border-radius: 6px !important;
-           box-shadow: none !important;
+           padding: 10px 20px !important;
+           min-height: 42px !important;
+           font-size: 0.95rem !important;
+           font-weight: 600 !important;
+           box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+           display: inline-flex !important;
+           align-items: center !important;
+           justify-content: center !important;
+           gap: 8px !important;
        }
 
        [data-testid="stFileUploaderDropzone"] button:hover {
@@ -109,32 +126,19 @@ st.markdown(
            color: #0f172a !important;
        }
 
-       [data-testid="stFileUploaderDropzone"] button p,
-       [data-testid="stFileUploaderDropzone"] button span:not([aria-hidden="true"]) {
-           font-family: 'Lora', 'Georgia', serif !important;
-           color: #0f172a !important;
-       }
-
-       /* File Uploader secondary text (200MB limit, etc.) */
-       [data-testid="stFileUploaderDropzone"] [data-testid="stMarkdownContainer"] p,
-       [data-testid="stFileUploaderDropzone"] small,
-       [data-testid="stFileUploaderDropzone"] label {
-           color: #475569 !important;
-           font-family: 'Lora', 'Georgia', serif !important;
-       }
-
-       /* Fix Dark Uploaded File Badge/Pill Background */
+       /* Fix Uploaded File Badge / Pill (No Dark Mode) */
        [data-testid="stFileUploaderFileData"],
-       div[data-testid="stFileUploaderFileData"],
-       [data-testid="stFileUploaderFileName"] {
-           background-color: #f1f5f9 !important;
+       div[data-testid="stFileUploaderFileData"] {
+           background-color: #ffffff !important;
            color: #0f172a !important;
            border: 1px solid #cbd5e1 !important;
            border-radius: 6px !important;
+           padding: 8px 14px !important;
        }
 
        [data-testid="stFileUploaderFileData"] * {
            color: #0f172a !important;
+           fill: #0f172a !important;
        }
 
        /* 5. Pure Light Text Area */
@@ -266,7 +270,6 @@ def process_pdf_with_annotations(pdf_file):
     w, h = img.size
     page_crops = []
 
-    # 4 High-Res Quadrants for visual optical comparison
     quadrants = [
         (0, 0, int(w * 0.55), int(h * 0.55)),
         (int(w * 0.45), 0, w, int(h * 0.55)),
