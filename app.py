@@ -1,48 +1,9 @@
-import streamlit as st
-import fitz  # PyMuPDF
-import base64
-import openai
-import streamlit.components.v1 as components
-import io
-import time
-from PIL import Image, ImageEnhance
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
-st.set_page_config(page_title="MARKUP AUDITOR", layout="wide")
-
-# CSS Styling - Clean Light Background with Civil3D Style Tab Dock
-st.markdown("""
-   <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DDM%2BSans%3Awght%40400%3B500%3B700%26family%3DJetBrains%2BMono%3Awght%40400%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C7105e593cec14fc74cd208def3fa4b64%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639216453518727890%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=t2H3jeZ4gDUrLJMRw%2FlXHJL0gtL%2BQLxLOpN8G5OVqGA%3D&reserved=0');
-
-       html, body, .stApp {
-           background-color: #f4f5f7;
-           color: #1c1e21;
-           font-family: 'DM Sans', sans-serif !important;
+           background-color: #ffffff !important;
        }
 
-       .centered-title {
-           text-align: center;
-           font-size: 2.6rem;
-           font-weight: 700;
-           color: #1a1a1a;
-           margin: 5px 0;
-           letter-spacing: -0.5px;
-       }
-
-       .centered-subtitle {
-           text-align: center;
-           font-size: 1.05rem;
-           color: #555555;
-           margin-bottom: 20px;
-       }
-
-       div[data-testid="stFileUploader"], div.stTextArea {
-           background-color: #ffffff;
-           border-radius: 8px;
-           padding: 12px;
-           border: 1px solid #e0e0e0;
-           box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+       div[data-baseweb="textarea"] {
+           background-color: #ffffff !important;
        }
 
        .stButton>button {
@@ -76,7 +37,7 @@ st.markdown("""
    </style>
 """, unsafe_allow_html=True)
 
-# Centered Light Header
+# Centered Header
 st.markdown("<h1 class='centered-title'>👷 MARKUP AUDITOR</h1>", unsafe_allow_html=True)
 st.markdown("<p class='centered-subtitle'>🛠️ AI QA/QC Structural & Civil Drawing Markup Verification</p>", unsafe_allow_html=True)
 
@@ -106,8 +67,7 @@ def process_pdf_with_annotations(pdf_file):
         images_full.append(img_data)
 
         page_annots = []
-        annot = page.first_annot
-        while annot:
+        for annot in page.annots():
             info = annot.info
             page_annots.append({
                 "author": info.get("title", "").strip(),
@@ -115,7 +75,6 @@ def process_pdf_with_annotations(pdf_file):
                 "subject": info.get("subject", "").strip(),
                 "type": annot.type[1] if isinstance(annot.type, tuple) else str(annot.type)
             })
-            annot = annot.next
 
         annots_per_page.append(page_annots)
 
@@ -143,19 +102,21 @@ def process_pdf_with_annotations(pdf_file):
     return images_full, crops_per_page, annots_per_page, len(doc)
 
 def process_single_sheet(sheet_index, img_a_bytes, img_b_bytes, crops_a_list, crops_b_list, annots_a_list, user_notes, api_key_val):
-    client = openai.OpenAI(api_key=api_key_val)
+    client = OpenAI(api_key=api_key_val)
 
     base64_a = base64.b64encode(img_a_bytes).decode('utf-8')
     base64_b = base64.b64encode(img_b_bytes).decode('utf-8')
 
-    annot_summary = ""
-    if annots_a_list:
-        annot_summary = "\nEXTRACTED VECTOR MARKUPS ON REV A:\n"
+    if annots_a_list and len(annots_a_list) > 0:
+        annot_summary = f"\nEXTRACTED VECTOR ANNOTATIONS ON REV A SHEET {sheet_index+1}:\n"
         for idx, a in enumerate(annots_a_list):
-            annot_summary += f"- Redline #{idx+1} ({a['type']}): \"{a['content']}\"\n"
+            txt = a['content'] if a['content'] else "Graphic Markup / Callout Box"
+            annot_summary += f"- Redline #{idx+1} ({a['type']}): \"{txt}\" (Subject: {a['subject']})\n"
+    else:
+        annot_summary = f"\nNO EMBEDDED PDF VECTOR ANNOTATIONS DETECTED ON SHEET {sheet_index+1}.\n"
 
     content_payload = [
-        {"type": "text", "text": f"User Audit Directives: {user_notes}\n{annot_summary}\nCompare Sheet {sheet_index+1} Rev A (Redlines) against Rev B (Final Revised Drawing)."}
+        {"type": "text", "text": f"User Specific Directives: {user_notes}\n{annot_summary}\nCompare Sheet {sheet_index+1} Rev A against Rev B."}
     ]
 
     content_payload.append({"type": "text", "text": "REV A OVERALL SHEET (Redlines):"})
@@ -174,22 +135,19 @@ def process_single_sheet(sheet_index, img_a_bytes, img_b_bytes, crops_a_list, cr
 
     system_prompt = (
         f"You are a Senior Structural & Civil Engineering QA/QC Inspector auditing Sheet {sheet_index+1}.\n\n"
-        "CRITICAL DRAFTING EVALUATION DIRECTIVES:\n"
-        "1. Redlines on Rev A (e.g., 'SPACE EVENLY @ 8'-6\" OC' with crossed out members) are DRAFTING INSTRUCTIONS for CAD modifications.\n"
-        "2. DO NOT expect redline directive text to appear on Rev B. Once drafted, redline notes are removed.\n"
-        "3. YOU MUST CHECK PHYSICAL CAD GEOMETRY IN REV B:\n"
-        "   - Inspect structural members (beams, joists, piles, walls, pipes).\n"
-        "   - If Rev A instructed 'Space evenly @ 8'-6\" OC' and showed 2 beams crossed out, check if Rev B physically removed those 2 members and re-spaced the remaining beams across the span.\n"
-        "   - If physical members were removed and re-spaced as requested, mark status as FULLY ADDRESSED.\n"
-        "   - Only mark as MISSED if Rev B physically failed to alter the geometry/members.\n"
-        "4. Ignore standard unedited title block text (dwg path, scale, borders).\n\n"
+        "STRICT AUDIT & SHEET ISOLATION RULES:\n"
+        f"1. Evaluate ONLY Sheet {sheet_index+1}. DO NOT cross-reference or invent directives from other sheets or previous drawings.\n"
+        "2. Check the EXTRACTED VECTOR ANNOTATIONS layer provided above for this specific sheet.\n"
+        "3. IF NO REDLINES OR ANNOTATIONS EXIST ON THIS SHEET (in metadata or visually), YOU MUST SET STATUS TO 'NO MARKUPS DETECTED ON THIS SHEET' AND DO NOT INVENT CALLOUTS.\n"
+        "4. If markups exist, evaluate physical CAD drafting execution in Rev B.\n"
+        "5. Read the Title Block on the bottom right of the image to state the true Sheet Number (e.g., CM-1.0, CM-1.1).\n\n"
         "FORMAT YOUR OUTPUT EXACTLY AS FOLLOWS:\n\n"
         "### Engineering Callout & Design Delta Audit\n\n"
-        "* **Location & Drawing Ref**: [Grid Lines / Detail Ref / Location]\n"
-        "  * **Engineer Redline Directive**: [e.g. 'Space beams evenly @ 8'-6\" OC & remove 2 interior beams']\n"
-        "  * **Rev B Visual Geometry Verification**: [Describe physical CAD drafting changes observed in Rev B]\n"
-        "  * **Status**: FULLY ADDRESSED (or MISSED / PARTIALLY ADDRESSED)\n"
-        "  * **QA/QC Technical Notes**: [Explanation of physical drafting execution]\n"
+        "* **Location & Drawing Ref**: [Grid Lines / Detail Ref / Title Block Sheet Number]\n"
+        "  * **Engineer Redline Directive**: [Exact directive on THIS sheet, or 'None']\n"
+        "  * **Rev B Visual Geometry Verification**: [Observed physical CAD changes in Rev B]\n"
+        "  * **Status**: FULLY ADDRESSED (or MISSED / PARTIALLY ADDRESSED / NO MARKUPS DETECTED ON THIS SHEET)\n"
+        "  * **QA/QC Technical Notes**: [Technical notes]\n"
     )
 
     max_retries = 5
@@ -205,7 +163,7 @@ def process_single_sheet(sheet_index, img_a_bytes, img_b_bytes, crops_a_list, cr
                 max_tokens=2500
             )
             return sheet_index, response.choices[0].message.content
-        except openai.RateLimitError as e:
+        except Exception as e:
             if attempt < max_retries - 1:
                 time.sleep(backoff)
                 backoff *= 1.5
@@ -218,7 +176,7 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C7105e593cec14fc74cd208def3fa4b64%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639216453518770864%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=n22KQRMCP8TEyPp2nii2hpsl0n2MzGCp4bmo5ewWETs%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C7bec4924311c4b62824f08def8813c7d%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221431161557028%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=Au042xm725D2A%2Fosdn9pWMQZB%2B1gyVBzfJ3QeSGejKc%3D&reserved=0"></script>
         <style>
             body {{ margin: 0; padding: 0; background-color: #111; font-family: sans-serif; color: #ffffff; overflow: hidden; }}
             .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #ccc; border-radius: 6px; background: #000; overflow: hidden; }}
@@ -271,13 +229,13 @@ markup_notes = st.text_area(
 
 if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
     if not api_key:
-        st.error("Please enter your OpenAI API key in the sidebar.")
+        st.error("Please enter your OpenAI API key in the sidebar or Streamlit Secrets.")
     else:
         loader_placeholder = st.empty()
         loader_placeholder.markdown("""
             <div class='loader-box'>
                 <span style='font-size: 2rem;'>👷</span>
-                <span style='font-weight: 600; color: #333;'>DISSECTING DRAWINGS... Tiling high-res visual grids...</span>
+                <span style='font-weight: 600; color: #333;'>DISSECTING DRAWINGS... Extracting annotation layers & tiling visual grids...</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -286,7 +244,7 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
 
         total_pages = min(count_a, count_b)
         results_dict = {}
-        sheet_names = [f"CM-{i+1}.0" if i > 0 else "CM-1.0" for i in range(total_pages)]
+        sheet_names = [f"Sheet {i+1}" for i in range(total_pages)]
 
         with ThreadPoolExecutor(max_workers=3) as executor:
             future_to_index = {}
@@ -318,8 +276,8 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
             </div>
         """, unsafe_allow_html=True)
 
-        full_audit_text = "\n\n".join([f"**Sheet {idx+1} ({sheet_names[idx]}):**\n" + res for idx, res in enumerate(ordered_results)])
-        client = openai.OpenAI(api_key=api_key)
+        full_audit_text = "\n\n".join([f"**Sheet {idx+1}:**\n" + res for idx, res in enumerate(ordered_results)])
+        client = OpenAI(api_key=api_key)
 
         missed_summary = ""
         for attempt in range(5):
@@ -331,7 +289,7 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
                             "role": "system",
                             "content": (
                                 "You are a Chief Structural QA/QC Manager. Synthesize ONLY the MISSED or INCOMPLETE markups across all sheets.\n"
-                                "Format as bullet points categorized by sheet designation (e.g., **CM-1.0**).\n"
+                                "Format as bullet points categorized by sheet number.\n"
                                 "Include the requested engineering directive and why physical drafting failed in Rev B. If zero items were missed, state 'No missed markups detected.'"
                             )
                         },
@@ -341,7 +299,7 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
                 )
                 missed_summary = res_missed.choices[0].message.content
                 break
-            except openai.RateLimitError:
+            except Exception:
                 time.sleep(10)
 
         addressed_summary = ""
@@ -354,7 +312,7 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
                             "role": "system",
                             "content": (
                                 "You are a Chief Structural QA/QC Manager. Synthesize ONLY the FULLY ADDRESSED markups across all sheets.\n"
-                                "Format as bullet points categorized by sheet designation (e.g., **CM-1.0**).\n"
+                                "Format as bullet points categorized by sheet number.\n"
                                 "Briefly state the verified physical drawing change executed in Rev B."
                             )
                         },
@@ -364,7 +322,7 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
                 )
                 addressed_summary = res_addressed.choices[0].message.content
                 break
-            except openai.RateLimitError:
+            except Exception:
                 time.sleep(10)
 
         loader_placeholder.empty()
@@ -432,7 +390,6 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
         img_b = st.session_state.images_b[current]
         result_text = st.session_state.audit_results[current]
 
-        st.markdown("#### 🔍 Interactive Zoom & Pan (Mouse Wheel to Zoom, Click & Drag to Pan)")
         c1, c2 = st.columns(2)
         with c1:
             render_panzoom_image(img_a, f"Rev A (Redlines) — {sheet_names[current]}", f"reva_{current}")
@@ -454,7 +411,7 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
             st.success("### ✅ Fully Addressed Markups")
             st.markdown(st.session_state.summary_addressed)
 
-    # Civil3D Layout Tabs Dock Bar (Dark CAD tab bar placed at bottom of light theme page)
+    # Civil3D Layout Tabs Dock Bar
     st.write("---")
     st.markdown("<p style='font-family: monospace; font-weight: 700; color: #333; margin-bottom: 5px;'>📐 CIVIL3D LAYOUT TABS</p>", unsafe_allow_html=True)
 
