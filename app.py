@@ -8,174 +8,273 @@ import time
 from PIL import Image, ImageEnhance
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-st.set_page_config(page_title="Markup Auditor | QA/QC Engine", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Markup Auditor | Delta Verification Engine", layout="wide", initial_sidebar_state="expanded")
 
-# --- AEROSPACE & CAD ULTRA-MODERN STYLING (SpaceX / Autodesk / Blue Origin Aesthetic) ---
+# --- PULSEBOARD / VERCEL / RAYCAST ULTRA-MODERN DARK UI ---
 st.markdown("""
    <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DOrbitron%3Awght%40500%3B700%3B900%26family%3DInter%3Awght%40300%3B400%3B600%26family%3DJetBrains%2BMono%3Awght%40400%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cd3e8f1492e2a456fc33308def88f25c0%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221490898062890%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=AUaYrRaUjmNZMz3g45K85uvxlNnKjTJrH1S9LPKaRIw%3D&reserved=0');
+       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DPlus%2BJakarta%2BSans%3Awght%40300%3B400%3B500%3B600%3B700%3B800%3B900%26family%3DJetBrains%2BMono%3Awght%40400%3B500%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C259d5dc390d24ec1f0ca08def890a735%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221497360305017%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=1x%2BZe5YDxOKefZcmv6yei3w2Ac%2BeROZeaIWYLLCVRHo%3D&reserved=0');
 
        html, body, .stApp {
-           background-color: #05070b !important;
-           color: #e2e8f0 !important;
-           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+           background-color: #030712 !important;
+           color: #f8fafc !important;
+           font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
        }
 
-       /* Deep Aerospace Header Card */
-       .aerospace-header {
-           background: radial-gradient(circle at top right, #111a2e 0%, #080d1a 60%, #030508 100%);
-           border: 1px solid rgba(56, 189, 248, 0.25);
-           border-radius: 8px;
-           padding: 28px 36px;
-           margin-bottom: 28px;
-           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(56, 189, 248, 0.05);
-           position: relative;
-           overflow: hidden;
+       /* Background Radial Glow Effect */
+       .stApp {
+           background-image:
+               radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+               radial-gradient(circle at 85% 20%, rgba(147, 51, 234, 0.08) 0%, transparent 45%) !important;
        }
 
-       .aerospace-header::before {
-           content: '';
-           position: absolute;
-           top: 0;
-           left: 0;
-           width: 100%;
-           height: 2px;
-           background: linear-gradient(90deg, #00f0ff 0%, #0052ff 50%, transparent 100%);
+       /* Top Navigation Bar */
+       .top-nav {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 12px 24px;
+           background: rgba(15, 23, 42, 0.6);
+           backdrop-filter: blur(12px);
+           border: 1px solid rgba(255, 255, 255, 0.08);
+           border-radius: 12px;
+           margin-bottom: 32px;
        }
 
-       .brand-title {
-           font-family: 'Orbitron', sans-serif;
-           font-size: 2.2rem;
-           font-weight: 900;
-           color: #ffffff;
-           letter-spacing: 0.08em;
-           margin: 0;
+       .nav-brand {
            display: flex;
            align-items: center;
-           gap: 14px;
-           text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+           gap: 10px;
+           font-weight: 800;
+           font-size: 1.1rem;
+           letter-spacing: -0.02em;
+           color: #ffffff;
        }
 
-       .brand-subtitle {
-           font-family: 'JetBrains Mono', monospace;
+       .nav-badge {
+           background: rgba(59, 130, 246, 0.15);
+           color: #60a5fa;
+           border: 1px solid rgba(96, 165, 250, 0.3);
+           padding: 2px 10px;
+           border-radius: 20px;
+           font-size: 0.72rem;
+           font-weight: 600;
+       }
+
+       .nav-links {
+           display: flex;
+           gap: 24px;
            font-size: 0.85rem;
-           color: #00f0ff;
-           margin-top: 8px;
-           letter-spacing: 0.12em;
-           text-transform: uppercase;
-           opacity: 0.85;
+           color: #94a3b8;
+           font-weight: 500;
        }
 
-       /* Input Section Containers */
-       .input-label {
+       /* PulseBoard Hero Typography */
+       .hero-container {
+           margin: 20px 0 36px 0;
+           max-width: 900px;
+       }
+
+       .hero-title {
+           font-size: 3.8rem;
+           font-weight: 900;
+           line-height: 1.05;
+           letter-spacing: -0.03em;
+           color: #ffffff;
+           margin: 0 0 16px 0;
+           text-transform: uppercase;
+       }
+
+       .gradient-text {
+           background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+       }
+
+       .hero-subtitle {
+           font-size: 1.05rem;
+           color: #94a3b8;
+           line-height: 1.6;
+           font-weight: 400;
+           max-width: 680px;
+           margin-bottom: 28px;
+       }
+
+       /* Metric Counters Row */
+       .metrics-row {
+           display: flex;
+           gap: 40px;
+           padding-top: 12px;
+           border-top: 1px solid rgba(255, 255, 255, 0.08);
+           margin-bottom: 32px;
+       }
+
+       .metric-item {
+           display: flex;
+           flex-direction: column;
+       }
+
+       .metric-val {
+           font-size: 1.5rem;
+           font-weight: 800;
+           color: #ffffff;
+           letter-spacing: -0.02em;
+       }
+
+       .metric-lbl {
+           font-size: 0.75rem;
+           color: #64748b;
+           font-weight: 500;
+           text-transform: uppercase;
+           letter-spacing: 0.05em;
+           margin-top: 2px;
+       }
+
+       /* Card Section Styling */
+       .card-label {
            font-family: 'JetBrains Mono', monospace;
            font-size: 0.78rem;
            font-weight: 600;
-           color: #38bdf8;
-           letter-spacing: 0.1em;
+           color: #60a5fa;
+           letter-spacing: 0.08em;
            text-transform: uppercase;
-           margin-bottom: 8px;
+           margin-bottom: 10px;
            display: flex;
            align-items: center;
            gap: 8px;
        }
 
-       /* Fix Streamlit Light Boxes for Dark Mode */
-       [data-testid="stFileUploader"] {
-           background-color: transparent !important;
-       }
-
+       /* File Uploader Custom Styling */
        [data-testid="stFileUploaderDropzone"] {
-           background-color: #0a0f1d !important;
-           border: 1px solid rgba(56, 189, 248, 0.2) !important;
-           border-radius: 8px !important;
-           transition: all 0.2s ease;
+           background: rgba(15, 23, 42, 0.5) !important;
+           border: 1px solid rgba(255, 255, 255, 0.1) !important;
+           border-radius: 12px !important;
+           padding: 24px !important;
+           transition: all 0.2s ease-in-out;
        }
 
        [data-testid="stFileUploaderDropzone"]:hover {
-           border-color: #00f0ff !important;
-           box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+           border-color: #3b82f6 !important;
+           background: rgba(15, 23, 42, 0.8) !important;
+           box-shadow: 0 0 25px rgba(59, 130, 246, 0.15);
        }
 
        [data-testid="stFileUploaderDropzone"] * {
            color: #94a3b8 !important;
        }
 
+       /* Text Area Styling */
        div[data-baseweb="textarea"] {
-           background-color: #0a0f1d !important;
-           border: 1px solid rgba(56, 189, 248, 0.2) !important;
-           border-radius: 8px !important;
+           background-color: rgba(15, 23, 42, 0.5) !important;
+           border: 1px solid rgba(255, 255, 255, 0.1) !important;
+           border-radius: 12px !important;
        }
 
        div[data-baseweb="textarea"] textarea {
            color: #f8fafc !important;
-           background-color: #0a0f1d !important;
-           font-family: 'JetBrains Mono', monospace !important;
-           font-size: 0.88rem !important;
+           background-color: transparent !important;
+           font-family: 'Plus Jakarta Sans', sans-serif !important;
+           font-size: 0.9rem !important;
        }
 
-       /* Centered Aerospace CTA Launch Button */
+       /* PulseBoard CTA Button (Centered Pill) */
        div.stButton > button {
            width: 100% !important;
-           background: linear-gradient(135deg, #0052ff 0%, #00d1ff 100%) !important;
+           background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
            color: #ffffff !important;
-           font-family: 'Orbitron', sans-serif !important;
+           font-family: 'Plus Jakarta Sans', sans-serif !important;
            font-size: 0.95rem !important;
            font-weight: 700 !important;
-           letter-spacing: 0.12em !important;
-           padding: 16px 28px !important;
-           border-radius: 6px !important;
-           border: none !important;
-           box-shadow: 0 0 25px rgba(0, 209, 255, 0.35) !important;
+           padding: 16px 32px !important;
+           border-radius: 40px !important;
+           border: 1px solid rgba(147, 197, 253, 0.3) !important;
+           box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35) !important;
            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-           text-transform: uppercase !important;
+           letter-spacing: 0.02em !important;
        }
 
        div.stButton > button:hover {
-           background: linear-gradient(135deg, #0041cb 0%, #00b8e6 100%) !important;
-           box-shadow: 0 0 35px rgba(0, 209, 255, 0.6) !important;
-           transform: translateY(-1px);
+           background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+           box-shadow: 0 12px 40px rgba(59, 130, 246, 0.5) !important;
+           transform: translateY(-2px);
        }
 
-       /* Status & Loader Box */
+       /* Loader Box */
        .loader-box {
            display: flex;
            align-items: center;
            justify-content: center;
            gap: 16px;
-           background-color: #0a0f1d;
-           border: 1px solid #00f0ff;
+           background: rgba(15, 23, 42, 0.8);
+           border: 1px solid #3b82f6;
            padding: 20px;
-           border-radius: 6px;
-           margin: 20px 0;
-           color: #00f0ff;
+           border-radius: 12px;
+           margin: 24px 0;
+           color: #60a5fa;
            font-family: 'JetBrains Mono', monospace;
            font-weight: 600;
-           letter-spacing: 0.05em;
-           box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+           box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
        }
 
-       /* CAD Viewport Dock Label */
-       .cad-dock-label {
-           font-family: 'Orbitron', sans-serif;
-           font-size: 0.75rem;
-           font-weight: 700;
-           letter-spacing: 0.15em;
-           color: #38bdf8;
-           text-transform: uppercase;
-           margin-bottom: 12px;
+       /* Footer Logo Ticker Bar (PulseBoard Style) */
+       .ticker-bar {
+           margin-top: 60px;
+           padding-top: 24px;
+           border-top: 1px solid rgba(255, 255, 255, 0.06);
+           display: flex;
+           justify-content: space-around;
+           align-items: center;
+           opacity: 0.45;
+           font-family: 'JetBrains Mono', monospace;
+           font-size: 0.8rem;
+           letter-spacing: 0.05em;
+           color: #94a3b8;
        }
    </style>
 """, unsafe_allow_html=True)
 
-# Executive Aerospace Hero Banner
+# PulseBoard Top Navigation Bar
 st.markdown("""
-   <div class="aerospace-header">
-       <div class="brand-title">
-           <span>MARKUP AUDITOR</span>
-           <span style="font-family: 'JetBrains Mono'; font-size: 0.7rem; background: rgba(0, 240, 255, 0.15); color: #00f0ff; border: 1px solid #00f0ff; padding: 4px 10px; border-radius: 4px; font-weight: 600; vertical-align: middle;">FLIGHT-GRADE QA/QC</span>
+   <div class="top-nav">
+       <div class="nav-brand">
+           <span style="color: #3b82f6; font-size: 1.3rem;">⚡</span>
+           <span>MarkupAuditor</span>
+           <span class="nav-badge">ENGINEERING V2.4</span>
        </div>
-       <div class="brand-subtitle">// Automated Engineering Drawing Delta Verification & CAD Redline Audit System</div>
+       <div class="nav-links">
+           <span>Vector Engine</span>
+           <span>QA/QC Pipeline</span>
+           <span>CAD Delta</span>
+           <span>Enterprise</span>
+       </div>
+   </div>
+""", unsafe_allow_html=True)
+
+# PulseBoard Hero Typography Section
+st.markdown("""
+   <div class="hero-container">
+       <div class="hero-title">
+           ENGINEERING<br>
+           <span class="gradient-text">DIGITAL REDLINE</span><br>
+           AUDITOR
+       </div>
+       <div class="hero-subtitle">
+           Automated drawing comparison and intelligence engine. Upload Rev A markup sheets alongside Rev B revised drawing packages to detect, track, and verify CAD drafting modifications instantly.
+       </div>
+       <div class="metrics-row">
+           <div class="metric-item">
+               <span class="metric-val">100%</span>
+               <span class="metric-lbl">Vector Annotations</span>
+           </div>
+           <div class="metric-item">
+               <span class="metric-val">4-Quad</span>
+               <span class="metric-lbl">High-Res Inspection</span>
+           </div>
+           <div class="metric-item">
+               <span class="metric-val">GPT-4o</span>
+               <span class="metric-lbl">Vision QA Engine</span>
+           </div>
+       </div>
    </div>
 """, unsafe_allow_html=True)
 
@@ -314,14 +413,14 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cd3e8f1492e2a456fc33308def88f25c0%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221490898103551%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=bCNRwLly7pI8ubl1VbyxFhblopGuGSJQv8wvrWuAUo4%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C259d5dc390d24ec1f0ca08def890a735%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221497360341557%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=75ywWcWdExZ2scF70ms0p4qMO1NlZNN1vouFfB6uZYY%3D&reserved=0"></script>
         <style>
-            body {{ margin: 0; padding: 0; background-color: #05070b; font-family: sans-serif; color: #ffffff; overflow: hidden; }}
-            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; background: #020408; overflow: hidden; }}
+            body {{ margin: 0; padding: 0; background-color: #030712; font-family: sans-serif; color: #ffffff; overflow: hidden; }}
+            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; background: #000000; overflow: hidden; }}
             .controls {{ position: absolute; top: 12px; right: 12px; z-index: 100; display: flex; gap: 6px; }}
-            .btn {{ background: #0a0f1d; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: monospace; }}
-            .btn:hover {{ background: #00f0ff; color: #000; }}
-            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: rgba(5, 7, 11, 0.9); padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3); font-family: monospace; }}
+            .btn {{ background: #0f172a; color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: sans-serif; }}
+            .btn:hover {{ background: #3b82f6; color: #fff; }}
+            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #60a5fa; border: 1px solid rgba(255, 255, 255, 0.1); }}
             .pan-target {{ width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; }}
             .pan-target img {{ max-width: 98%; max-height: 98%; object-fit: contain; }}
             .pan-target:active {{ cursor: grabbing; }}
@@ -353,14 +452,14 @@ def render_panzoom_image(img_bytes, caption, key_id):
     components.html(html_code, height=535)
 
 with col1:
-    st.markdown("<div class='input-label'><span>01 //</span> ENGINEER MARKUPS (REV A)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='card-label'><span>01 //</span> ENGINEER MARKUPS (REV A)</div>", unsafe_allow_html=True)
     rev_a_file = st.file_uploader("Upload Rev A PDF", type=["pdf"], key="a", label_visibility="collapsed")
 
 with col2:
-    st.markdown("<div class='input-label'><span>02 //</span> REVISED DRAWING SET (REV B)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='card-label'><span>02 //</span> REVISED DRAWING SET (REV B)</div>", unsafe_allow_html=True)
     rev_b_file = st.file_uploader("Upload Rev B PDF", type=["pdf"], key="b", label_visibility="collapsed")
 
-st.markdown("<div class='input-label' style='margin-top: 14px;'><span>03 //</span> AUDIT DIRECTIVES & CRITICAL AREAS (OPTIONAL)</div>", unsafe_allow_html=True)
+st.markdown("<div class='card-label' style='margin-top: 16px;'><span>03 //</span> CRITICAL INSPECTION DIRECTIVES (OPTIONAL)</div>", unsafe_allow_html=True)
 markup_notes = st.text_area(
     "Notes",
     placeholder="e.g., Verify beam spacing adjustments @ 8'-6\" OC and removal of 2 interior structural beams.",
@@ -369,11 +468,11 @@ markup_notes = st.text_area(
 
 st.write("")
 
-# Centered CTA Launch Button using standard column balance
+# Centered Pill Launch Button
 btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
 
 with btn_col2:
-    run_audit = st.button("RUN AUDIT & VERIFICATION PROCESS")
+    run_audit = st.button("Start Verification Process →")
 
 if run_audit and rev_a_file and rev_b_file:
     if not api_key:
@@ -382,7 +481,7 @@ if run_audit and rev_a_file and rev_b_file:
         loader_placeholder = st.empty()
         loader_placeholder.markdown("""
             <div class='loader-box'>
-                <span>[SYSTEM]: EXTRACTING VECTOR LAYERS & GENERATING HIGH-RES QUADRANT GRIDS...</span>
+                <span>Extracting Vector Layers & Generating High-Res Quadrant Grids...</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -409,7 +508,7 @@ if run_audit and rev_a_file and rev_b_file:
                 completed_count += 1
                 loader_placeholder.markdown(f"""
                     <div class='loader-box'>
-                        <span>[PROCESSING]: AUDITING SHEET GEOMETRY... SHEET {completed_count} OF {total_pages} COMPLETED</span>
+                        <span>Auditing Sheet Geometry... Processed {completed_count} of {total_pages} Sheets</span>
                     </div>
                 """, unsafe_allow_html=True)
 
@@ -417,7 +516,7 @@ if run_audit and rev_a_file and rev_b_file:
 
         loader_placeholder.markdown("""
             <div class='loader-box'>
-                <span>[ANALYZING]: SYNTHESIZING MASTER EXECUTIVE DELTAS...</span>
+                <span>Synthesizing Executive Delta Report...</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -520,7 +619,7 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
     with nav_col2:
         curr_label = sheet_names[current] if current < total else "Master QA/QC Executive Summary"
         st.markdown(
-            f"<h3 style='text-align: center; margin: 0; color: #f8fafc; font-family: Orbitron, sans-serif; font-size: 1.1rem; letter-spacing: 0.05em;'>{curr_label} ({current + 1} OF {total + 1})</h3>",
+            f"<h3 style='text-align: center; margin: 0; color: #f8fafc; font-size: 1.15rem; font-weight: 700;'>{curr_label} ({current + 1} of {total + 1})</h3>",
             unsafe_allow_html=True
         )
 
@@ -558,7 +657,7 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
 
     # CAD Layout Navigation Dock
     st.write("---")
-    st.markdown("<div class='cad-dock-label'>CAD VIEWPORTS & LAYOUT TABS</div>", unsafe_allow_html=True)
+    st.markdown("<div class='card-label'>CAD VIEWPORTS & LAYOUT TABS</div>", unsafe_allow_html=True)
 
     tab_cols = st.columns(min(total + 2, 12))
 
@@ -578,3 +677,13 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
         if st.button(summary_label, key="c3d_tab_summary"):
             st.session_state.current_slide = total
             st.rerun()
+
+# Bottom Ticker Bar (PulseBoard Tech Stack Style)
+st.markdown("""
+   <div class="ticker-bar">
+       <span>✦ PyMuPDF Engine</span>
+       <span>✦ OpenAI GPT-4o Vision</span>
+       <span>✦ High-DPI Quadrant Matrix</span>
+       <span>✦ Vector Layer Parser</span>
+   </div>
+""", unsafe_allow_html=True)
