@@ -10,43 +10,36 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 st.set_page_config(page_title="Markup Auditor", layout="wide", initial_sidebar_state="collapsed")
 
-# --- FULL LIGHT MODE STYLING & PERFECT CENTER BUTTON ---
+# --- ASH GRAY PALETTE & EXACT CENTER BUTTON ALIGNMENT ---
 st.markdown("""
    <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DPlus%2BJakarta%2BSans%3Awght%40400%3B600%3B700%3B800%3B900%26family%3DJetBrains%2BMono%3Awght%40500%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C82e744f7751c4a30713908def897a946%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221527532450629%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=QdQh6AGlmsJelw2jR37IzAM16MP85Us%2BX819dytEZi0%3D&reserved=0');
+       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DPlus%2BJakarta%2BSans%3Awght%40400%3B600%3B700%3B800%3B900%26family%3DJetBrains%2BMono%3Awght%40500%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cfbb0e5f93ede4d0a854608def8990301%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221533246949426%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=vi%2F7BgO0XTP%2BBSfg5pUCIg2UN4TxOiXg8a2w%2Fpw8Kow%3D&reserved=0');
 
-       /* Global Light Background Override */
+       /* Global Ash Gray Canvas */
        html, body, .stApp, [data-testid="stSidebar"] {
-           background-color: #f8fafc !important;
-           color: #0f172a !important;
+           background-color: #e2e8f0 !important;
+           color: #1e293b !important;
            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
-       }
-
-       /* Sidebar Clean Light Styling */
-       [data-testid="stSidebar"] {
-           border-right: 1px solid #e2e8f0 !important;
        }
 
        /* Centered Header Title */
        .hero-container {
            text-align: center;
-           margin: 20px auto 35px auto;
+           margin: 15px auto 30px auto;
            max-width: 800px;
        }
 
        .hero-title {
-           font-size: 3.2rem;
+           font-size: 3rem;
            font-weight: 900;
            letter-spacing: -0.03em;
            color: #0f172a;
            text-transform: uppercase;
-           margin-bottom: 6px;
+           margin-bottom: 4px;
        }
 
-       .gradient-text {
-           background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-           -webkit-background-clip: text;
-           -webkit-text-fill-color: transparent;
+       .slate-accent {
+           color: #475569;
        }
 
        /* Clean Card Section Labels */
@@ -54,37 +47,35 @@ st.markdown("""
            font-family: 'JetBrains Mono', monospace;
            font-size: 0.8rem;
            font-weight: 600;
-           color: #2563eb;
+           color: #475569;
            letter-spacing: 0.05em;
            text-transform: uppercase;
-           margin-bottom: 10px;
+           margin-bottom: 8px;
        }
 
-       /* Custom Light File Uploaders */
+       /* Ash Gray File Uploaders */
        [data-testid="stFileUploaderDropzone"] {
-           background: #ffffff !important;
+           background: #f1f5f9 !important;
            border: 1px solid #cbd5e1 !important;
-           border-radius: 12px !important;
-           padding: 24px !important;
+           border-radius: 10px !important;
+           padding: 20px !important;
            transition: all 0.2s ease;
-           box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
        }
 
        [data-testid="stFileUploaderDropzone"]:hover {
-           border-color: #2563eb !important;
-           box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1) !important;
+           border-color: #94a3b8 !important;
+           background: #ffffff !important;
        }
 
        [data-testid="stFileUploaderDropzone"] * {
            color: #475569 !important;
        }
 
-       /* Light Text Area Input */
+       /* Text Area Input (Ash Gray Background) */
        div[data-baseweb="textarea"] {
-           background-color: #ffffff !important;
+           background-color: #f1f5f9 !important;
            border: 1px solid #cbd5e1 !important;
-           border-radius: 12px !important;
-           box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+           border-radius: 10px !important;
        }
 
        div[data-baseweb="textarea"] textarea {
@@ -94,61 +85,60 @@ st.markdown("""
            font-size: 0.9rem !important;
        }
 
-       /* Centered Container for Action Button */
-       .button-center-wrapper {
-           display: flex;
-           justify-content: center;
-           align-items: center;
-           width: 100%;
-           margin-top: 28px;
-           margin-bottom: 20px;
+       /* Force Exact Center Alignment for Streamlit Buttons */
+       div.stButton, [data-testid="stButton"] {
+           display: flex !important;
+           justify-content: center !important;
+           align-items: center !important;
+           width: 100% !important;
+           margin: 15px 0 !important;
        }
 
-       /* Custom Pill Button Styling */
-       div.stButton > button {
-           background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
-           color: #ffffff !important;
+       /* Light Gray Button Styling */
+       div.stButton > button, [data-testid="stButton"] > button {
+           background-color: #f1f5f9 !important;
+           color: #1e293b !important;
            font-family: 'Plus Jakarta Sans', sans-serif !important;
-           font-size: 0.95rem !important;
+           font-size: 0.9rem !important;
            font-weight: 700 !important;
-           padding: 14px 40px !important;
-           border-radius: 40px !important;
-           border: none !important;
-           box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25) !important;
+           padding: 12px 36px !important;
+           border-radius: 30px !important;
+           border: 1px solid #cbd5e1 !important;
+           box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
            transition: all 0.2s ease !important;
-           margin: 0 auto !important;
-           display: block !important;
        }
 
-       div.stButton > button:hover {
-           transform: translateY(-2px);
-           box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4) !important;
+       div.stButton > button:hover, [data-testid="stButton"] > button:hover {
+           background-color: #cbd5e1 !important;
+           color: #0f172a !important;
+           border-color: #94a3b8 !important;
+           transform: translateY(-1px);
+           box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
        }
 
-       /* Loader Box */
+       /* Loader Status Box */
        .loader-box {
            display: flex;
            align-items: center;
            justify-content: center;
-           background: #ffffff;
-           border: 1px solid #2563eb;
+           background: #f1f5f9;
+           border: 1px solid #94a3b8;
            padding: 16px;
-           border-radius: 12px;
+           border-radius: 10px;
            margin: 20px 0;
-           color: #2563eb;
+           color: #334155;
            font-family: 'JetBrains Mono', monospace;
            font-weight: 600;
            text-align: center;
-           box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
        }
    </style>
 """, unsafe_allow_html=True)
 
-# Centered Minimal Header Title
+# Centered Title
 st.markdown("""
    <div class="hero-container">
        <div class="hero-title">
-           MARKUP <span class="gradient-text">AUDITOR</span>
+           MARKUP <span class="slate-accent">AUDITOR</span>
        </div>
    </div>
 """, unsafe_allow_html=True)
@@ -288,14 +278,14 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C82e744f7751c4a30713908def897a946%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221527532477669%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=MM5vVcWr36B8%2FKqNwZwlIlsrpwrBAtQEZIv%2BZ48WbRU%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cfbb0e5f93ede4d0a854608def8990301%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221533246989823%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=dr0DKElyFyr%2FXFhCJ2YAp92jow6k46s3FpHsl%2BBsfPc%3D&reserved=0"></script>
         <style>
-            body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; color: #0f172a; overflow: hidden; }}
-            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 12px; background: #e2e8f0; overflow: hidden; }}
+            body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; color: #1e293b; overflow: hidden; }}
+            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 10px; background: #cbd5e1; overflow: hidden; }}
             .controls {{ position: absolute; top: 12px; right: 12px; z-index: 100; display: flex; gap: 6px; }}
-            .btn {{ background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: sans-serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
-            .btn:hover {{ background: #2563eb; color: #fff; border-color: #2563eb; }}
-            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: #ffffff; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #2563eb; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+            .btn {{ background: #f1f5f9; color: #1e293b; border: 1px solid #94a3b8; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: sans-serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+            .btn:hover {{ background: #94a3b8; color: #0f172a; }}
+            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: #f1f5f9; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
             .pan-target {{ width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; }}
             .pan-target img {{ max-width: 98%; max-height: 98%; object-fit: contain; }}
             .pan-target:active {{ cursor: grabbing; }}
@@ -341,10 +331,8 @@ markup_notes = st.text_area(
     label_visibility="collapsed"
 )
 
-# Centered Action Button Wrapper
-btn_col1, btn_col2, btn_col3 = st.columns([1.5, 2, 1.5])
-with btn_col2:
-    run_audit = st.button("Run Audit Process →")
+# Perfectly Centered Main Action Button
+run_audit = st.button("Run Audit Process →")
 
 if run_audit and rev_a_file and rev_b_file:
     if not api_key:
@@ -549,4 +537,3 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
         if st.button(summary_label, key="c3d_tab_summary"):
             st.session_state.current_slide = total
             st.rerun()
-            
