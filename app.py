@@ -14,30 +14,33 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# --- SERIF TYPOGRAPHY, LIGHT GRAY UPLOADERS & FIXED ICON LIGATURES ---
+# --- SERIF TYPOGRAPHY & CLEAN NATIVE STREAMLIT UPLOADER ---
 st.markdown(
     """
    <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DLora%3Aital%2Cwght%400%2C400..700%3B1%2C400..700%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cddb0e7a1f9064ec30e5a08def89c92fb%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221548515809199%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=2BNiTxDnpNoZoOq52%2BaA2I8zs36UDzTl%2BIqR3pdB5sk%3D&reserved=0');
+       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DLora%3Aital%2Cwght%400%2C400..700%3B1%2C400..700%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C9c685c354605436cb5cc08def89e5c68%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221556250436271%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=rXpT0MnJBkpMIRQragRqfutfRadTZ%2Fc660hz0m9RNVg%3D&reserved=0');
 
-       /* 1. Global Serif Font Override (Excluding Icons) */
+       /* 1. Global Serif Font Override (Excludes Streamlit Icons) */
        html, body, .stApp, [data-testid="stSidebar"],
        input, textarea, select, p, h1, h2, h3, h4, h5, h6, label {
            font-family: 'Lora', 'Georgia', 'Times New Roman', serif !important;
        }
 
-       /* Preserve Icon Font Ligatures (Fixes 'upload upload' text glitch) */
-       i, svg, [data-testid="stIcon"], [class*="icon"], [class*="Icon"] {
-           font-family: sans-serif !important;
+       /* 2. Preserve Streamlit Material Icon Fonts */
+       [data-testid="stIconMaterial"],
+       [data-testid="stIcon"],
+       [data-baseweb="icon"],
+       span[aria-hidden="true"] {
+           font-family: "Material Symbols Outlined", sans-serif !important;
        }
 
-       /* 2. Global Ash Gray Canvas */
+       /* 3. Global Ash Gray Canvas */
        html, body, .stApp, [data-testid="stSidebar"] {
            background-color: #e2e8f0 !important;
            color: #0f172a !important;
        }
 
-       /* 3. Header Title Styling */
+       /* 4. Header Title Styling */
        .hero-container {
            text-align: center;
            margin: 15px auto 30px auto;
@@ -69,7 +72,7 @@ st.markdown(
            font-family: 'Lora', 'Georgia', serif !important;
        }
 
-       /* 4. FILE UPLOADER FIX (Light Gray Dropzone & Clean Buttons) */
+       /* 5. FILE UPLOADER (Clean Light Dropzone, Native Streamlit Controls) */
        [data-testid="stFileUploader"] {
            background-color: transparent !important;
        }
@@ -78,7 +81,7 @@ st.markdown(
            background-color: #f8fafc !important;
            border: 1.5px dashed #94a3b8 !important;
            border-radius: 8px !important;
-           padding: 18px !important;
+           padding: 16px !important;
        }
 
        section[data-testid="stFileUploaderDropzone"]:hover {
@@ -86,32 +89,7 @@ st.markdown(
            background-color: #ffffff !important;
        }
 
-       /* Style internal upload button inside file dropzone */
-       section[data-testid="stFileUploaderDropzone"] button {
-           background-color: #ffffff !important;
-           color: #0f172a !important;
-           border: 1px solid #cbd5e1 !important;
-           border-radius: 6px !important;
-           font-family: 'Lora', 'Georgia', serif !important;
-           font-weight: 600 !important;
-           padding: 6px 16px !important;
-           box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
-       }
-
-       section[data-testid="stFileUploaderDropzone"] button:hover {
-           background-color: #e2e8f0 !important;
-           border-color: #94a3b8 !important;
-           color: #000000 !important;
-       }
-
-       /* Fix instructions text inside upload dropzone */
-       section[data-testid="stFileUploaderDropzone"] span,
-       section[data-testid="stFileUploaderDropzone"] small {
-           color: #475569 !important;
-           font-family: 'Lora', 'Georgia', serif !important;
-       }
-
-       /* 5. TEXT AREA FIX (Light Ash Gray Input) */
+       /* 6. TEXT AREA FIX (Light Ash Gray Input) */
        [data-testid="stTextArea"] > div,
        [data-testid="stTextArea"] > div > div,
        div[data-baseweb="textarea"],
@@ -136,7 +114,7 @@ st.markdown(
            font-family: 'Lora', 'Georgia', serif !important;
        }
 
-       /* 6. MAIN ACTION BUTTONS */
+       /* 7. MAIN ACTION BUTTONS */
        div.stButton > button {
            background-color: #f1f5f9 !important;
            color: #0f172a !important;
@@ -160,7 +138,7 @@ st.markdown(
            box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
        }
 
-       /* 7. Status Display Box */
+       /* 8. Status Display Box */
        .loader-box {
            display: flex;
            align-items: center;
@@ -389,7 +367,7 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cddb0e7a1f9064ec30e5a08def89c92fb%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221548515850135%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=EaBgiZPFev81pHE79S6d2CRlbPifTcpE9DnHpJ3df8A%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C9c685c354605436cb5cc08def89e5c68%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221556250465006%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=7G8QvdROZBjotjuQzSQyZ9vLlSFanuyaOvVVDy3%2FARE%3D&reserved=0"></script>
         <style>
             body {{ margin: 0; padding: 0; background-color: transparent; font-family: 'Lora', 'Georgia', serif; color: #0f172a; overflow: hidden; }}
             .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 8px; background: #cbd5e1; overflow: hidden; }}
@@ -486,7 +464,7 @@ if run_audit and rev_a_file and rev_b_file:
     loader_placeholder.markdown(
         """
             <div class='loader-box'>
-                <span>Parsing Vector Annotation Metadata & Rasterizing Spatial Quadrant Grids...</span>
+                <span>Working with Annotation Layers & Processing Markups</span>
             </div>
         """,
         unsafe_allow_html=True,
@@ -528,7 +506,7 @@ if run_audit and rev_a_file and rev_b_file:
         loader_placeholder.markdown(
             f"""
                     <div class='loader-box'>
-                        <span>Performing Geometrical Delta Analysis... Evaluated {completed_count} of {total_pages} Sheet Sets</span>
+                        <span>Checking drawing revisions... Evaluated {completed_count} of {total_pages} Sheet Sets</span>
                     </div>
                 """,
             unsafe_allow_html=True,
@@ -714,13 +692,10 @@ if (
       unsafe_allow_html=True,
   )
 
-  tab_cols = st.columns(min(total + 2, 12))
-
-  with tab_cols[0]:
-    st.button("Model Space", key="c3d_model", disabled=True)
+  tab_cols = st.columns(min(total + 1, 12))
 
   for idx in range(total):
-    col_target = tab_cols[(idx + 1) % min(total + 2, 12)]
+    col_target = tab_cols[idx % min(total + 1, 12)]
     with col_target:
       tab_label = (
           f"• {sheet_names[idx]}" if idx == current else f"{sheet_names[idx]}"
@@ -729,7 +704,7 @@ if (
         st.session_state.current_slide = idx
         st.rerun()
 
-  with tab_cols[(total + 1) % min(total + 2, 12)]:
+  with tab_cols[total % min(total + 1, 12)]:
     summary_label = "• Summary" if current == total else "Summary"
     if st.button(summary_label, key="c3d_tab_summary"):
       st.session_state.current_slide = total
