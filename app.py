@@ -1,4 +1,53 @@
+import streamlit as st
+import pymupdf as fitz
+import base64
+from openai import OpenAI
+import streamlit.components.v1 as components
+import io
+import time
+from PIL import Image, ImageEnhance
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+st.set_page_config(page_title="MARKUP AUDITOR", layout="wide")
+
+# CSS Styling - Clean Light Background with Civil3D Style Tab Dock & Textarea Fix
+st.markdown("""
+   <style>
+       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DDM%2BSans%3Awght%40400%3B500%3B700%26family%3DJetBrains%2BMono%3Awght%40400%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C2bb220ba713f408b04d908def882da97%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221438063703743%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=7rSmQGCWLK%2Bl3i6AYJXunoPgsEoo27HOdhG8K90tBCs%3D&reserved=0');
+
+       html, body, .stApp {
+           background-color: #f4f5f7;
+           color: #1c1e21;
+           font-family: 'DM Sans', sans-serif !important;
+       }
+
+       .centered-title {
+           text-align: center;
+           font-size: 2.6rem;
+           font-weight: 700;
+           color: #1a1a1a;
+           margin: 5px 0;
+           letter-spacing: -0.5px;
+       }
+
+       .centered-subtitle {
+           text-align: center;
+           font-size: 1.05rem;
+           color: #555555;
+           margin-bottom: 20px;
+       }
+
+       /* Textarea contrast and background fix */
+       div[data-testid="stFileUploader"], div.stTextArea {
+           background-color: #ffffff !important;
+           border-radius: 8px;
+           padding: 12px;
+           border: 1px solid #e0e0e0;
+           box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+       }
+
+       div[data-baseweb="textarea"] textarea {
+           color: #111827 !important;
            background-color: #ffffff !important;
        }
 
@@ -176,7 +225,7 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C7bec4924311c4b62824f08def8813c7d%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221431161557028%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=Au042xm725D2A%2Fosdn9pWMQZB%2B1gyVBzfJ3QeSGejKc%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C2bb220ba713f408b04d908def882da97%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221438063749730%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=CHq2toBOAUK1yQ9rUP%2FaIDOR66KIR1mxm16w9cV0J7c%3D&reserved=0"></script>
         <style>
             body {{ margin: 0; padding: 0; background-color: #111; font-family: sans-serif; color: #ffffff; overflow: hidden; }}
             .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #ccc; border-radius: 6px; background: #000; overflow: hidden; }}
