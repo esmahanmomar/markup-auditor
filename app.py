@@ -10,10 +10,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 st.set_page_config(page_title="Markup Auditor", layout="wide", initial_sidebar_state="collapsed")
 
-# --- SERIF TYPOGRAPHY, ASH GRAY PALETTE & DEEP INPUT OVERRIDES ---
+# --- SERIF TYPOGRAPHY, ASH GRAY PALETTE & FIXED INPUT OVERRIDES ---
 st.markdown("""
    <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DLora%3Aital%2Cwght%400%2C400..700%3B1%2C400..700%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C68d906da3509428e85ba08def89a51e7%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221538888984851%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=sPYNLI7RhOUOXe7x9wdT%2BN51Yo5mJOtDAuxpGLeymko%3D&reserved=0');
+       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DLora%3Aital%2Cwght%400%2C400..700%3B1%2C400..700%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cd4f7f0efa7a04620219f08def89b8473%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221544022334740%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=fl5wPV3a4NOupchKNHqw%2FYAujzNCNbJJJy8eNt%2B6WgY%3D&reserved=0');
 
        /* 1. Global Serif Font Override */
        html, body, .stApp, [data-testid="stSidebar"],
@@ -21,7 +21,7 @@ st.markdown("""
            font-family: 'Lora', 'Georgia', 'Times New Roman', serif !important;
        }
 
-       /* 2. Global Ash Gray Background */
+       /* 2. Global Ash Gray Canvas */
        html, body, .stApp, [data-testid="stSidebar"] {
            background-color: #e2e8f0 !important;
            color: #0f172a !important;
@@ -57,7 +57,7 @@ st.markdown("""
            margin-bottom: 8px;
        }
 
-       /* 4. Deep Override for File Uploaders (Fixes Dark Background) */
+       /* 4. CLEAN FILE UPLOADER FIX (Fixes overlapping text/icon glitch) */
        [data-testid="stFileUploader"] {
            background-color: transparent !important;
        }
@@ -74,16 +74,9 @@ st.markdown("""
            background-color: #ffffff !important;
        }
 
-       section[data-testid="stFileUploaderDropzone"] * {
-           color: #1e293b !important;
-           background-color: transparent !important;
-       }
-
-       /* 5. Deep Override for Text Area & Inputs (Fixes Dark Box) */
-       div[data-testid="stTextArea"] {
-           background-color: transparent !important;
-       }
-
+       /* 5. TEXT AREA FIX (Forces entire text box to Light Ash Gray) */
+       [data-testid="stTextArea"] > div,
+       [data-testid="stTextArea"] > div > div,
        div[data-baseweb="textarea"],
        div[data-baseweb="base-input"] {
            background-color: #f1f5f9 !important;
@@ -289,7 +282,7 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C68d906da3509428e85ba08def89a51e7%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221538889033797%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=vE4hrzr5j%2FweXtm0IGhfJjZg%2FeU8EfzLuGoAy2fPyGM%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cd4f7f0efa7a04620219f08def89b8473%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221544022370843%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=o4ZjxrUONuc273rVKFwf8rP0MJST7O%2BzZfEeiSJ1Mlc%3D&reserved=0"></script>
         <style>
             body {{ margin: 0; padding: 0; background-color: transparent; font-family: 'Lora', 'Georgia', serif; color: #0f172a; overflow: hidden; }}
             .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 8px; background: #cbd5e1; overflow: hidden; }}
@@ -327,7 +320,7 @@ def render_panzoom_image(img_bytes, caption, key_id):
     """
     components.html(html_code, height=535)
 
-# --- FORM SECTION WITH PROFESSIONAL ENGINEERING LANGUAGE ---
+# --- FORM SECTION ---
 with col1:
     st.markdown("<div class='card-label'>01 // MARKED-UP DRAWING SET (REV A REDLINES)</div>", unsafe_allow_html=True)
     rev_a_file = st.file_uploader("Upload Rev A PDF", type=["pdf"], key="a", label_visibility="collapsed")
@@ -337,9 +330,11 @@ with col2:
     rev_b_file = st.file_uploader("Upload Rev B PDF", type=["pdf"], key="b", label_visibility="collapsed")
 
 st.markdown("<div class='card-label' style='margin-top: 14px;'>03 // MANDATORY QA/QC REVIEW DIRECTIVES & AUDIT SPECIFICATIONS (OPTIONAL)</div>", unsafe_allow_html=True)
+
+# UPDATED PLACEHOLDER (BM-102 and BM-103 removed)
 markup_notes = st.text_area(
     "Notes",
-    placeholder="e.g., Verify structural steel beam spacing @ 8'-6\" O.C. per RFI #42; confirm removal of interior framing members BM-102 and BM-103.",
+    placeholder="e.g., Verify structural steel beam spacing @ 8'-6\" O.C. per RFI #42; confirm revision of structural layout details.",
     label_visibility="collapsed"
 )
 
