@@ -10,29 +10,34 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 st.set_page_config(page_title="Markup Auditor", layout="wide", initial_sidebar_state="collapsed")
 
-# --- ASH GRAY PALETTE & EXACT CENTER BUTTON ALIGNMENT ---
+# --- SERIF TYPOGRAPHY, ASH GRAY PALETTE & DEEP INPUT OVERRIDES ---
 st.markdown("""
    <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DPlus%2BJakarta%2BSans%3Awght%40400%3B600%3B700%3B800%3B900%26family%3DJetBrains%2BMono%3Awght%40500%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cfbb0e5f93ede4d0a854608def8990301%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221533246949426%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=vi%2F7BgO0XTP%2BBSfg5pUCIg2UN4TxOiXg8a2w%2Fpw8Kow%3D&reserved=0');
+       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DLora%3Aital%2Cwght%400%2C400..700%3B1%2C400..700%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C68d906da3509428e85ba08def89a51e7%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221538888984851%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=sPYNLI7RhOUOXe7x9wdT%2BN51Yo5mJOtDAuxpGLeymko%3D&reserved=0');
 
-       /* Global Ash Gray Canvas */
-       html, body, .stApp, [data-testid="stSidebar"] {
-           background-color: #e2e8f0 !important;
-           color: #1e293b !important;
-           font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+       /* 1. Global Serif Font Override */
+       html, body, .stApp, [data-testid="stSidebar"],
+       button, input, textarea, select, div, span, p, h1, h2, h3, h4, h5, h6, label {
+           font-family: 'Lora', 'Georgia', 'Times New Roman', serif !important;
        }
 
-       /* Centered Header Title */
+       /* 2. Global Ash Gray Background */
+       html, body, .stApp, [data-testid="stSidebar"] {
+           background-color: #e2e8f0 !important;
+           color: #0f172a !important;
+       }
+
+       /* 3. Header Title Styling */
        .hero-container {
            text-align: center;
            margin: 15px auto 30px auto;
-           max-width: 800px;
+           max-width: 850px;
        }
 
        .hero-title {
-           font-size: 3rem;
-           font-weight: 900;
-           letter-spacing: -0.03em;
+           font-size: 2.8rem;
+           font-weight: 700;
+           letter-spacing: -0.02em;
            color: #0f172a;
            text-transform: uppercase;
            margin-bottom: 4px;
@@ -40,83 +45,89 @@ st.markdown("""
 
        .slate-accent {
            color: #475569;
+           font-style: italic;
        }
 
-       /* Clean Card Section Labels */
        .card-label {
-           font-family: 'JetBrains Mono', monospace;
-           font-size: 0.8rem;
-           font-weight: 600;
-           color: #475569;
+           font-size: 0.85rem;
+           font-weight: 700;
+           color: #334155;
            letter-spacing: 0.05em;
            text-transform: uppercase;
            margin-bottom: 8px;
        }
 
-       /* Ash Gray File Uploaders */
-       [data-testid="stFileUploaderDropzone"] {
-           background: #f1f5f9 !important;
-           border: 1px solid #cbd5e1 !important;
-           border-radius: 10px !important;
-           padding: 20px !important;
-           transition: all 0.2s ease;
-       }
-
-       [data-testid="stFileUploaderDropzone"]:hover {
-           border-color: #94a3b8 !important;
-           background: #ffffff !important;
-       }
-
-       [data-testid="stFileUploaderDropzone"] * {
-           color: #475569 !important;
-       }
-
-       /* Text Area Input (Ash Gray Background) */
-       div[data-baseweb="textarea"] {
-           background-color: #f1f5f9 !important;
-           border: 1px solid #cbd5e1 !important;
-           border-radius: 10px !important;
-       }
-
-       div[data-baseweb="textarea"] textarea {
-           color: #0f172a !important;
+       /* 4. Deep Override for File Uploaders (Fixes Dark Background) */
+       [data-testid="stFileUploader"] {
            background-color: transparent !important;
-           font-family: 'Plus Jakarta Sans', sans-serif !important;
-           font-size: 0.9rem !important;
        }
 
-       /* Force Exact Center Alignment for Streamlit Buttons */
-       div.stButton, [data-testid="stButton"] {
-           display: flex !important;
-           justify-content: center !important;
-           align-items: center !important;
-           width: 100% !important;
-           margin: 15px 0 !important;
-       }
-
-       /* Light Gray Button Styling */
-       div.stButton > button, [data-testid="stButton"] > button {
+       section[data-testid="stFileUploaderDropzone"] {
            background-color: #f1f5f9 !important;
+           border: 1.5px dashed #94a3b8 !important;
+           border-radius: 8px !important;
+           padding: 20px !important;
+       }
+
+       section[data-testid="stFileUploaderDropzone"]:hover {
+           border-color: #475569 !important;
+           background-color: #ffffff !important;
+       }
+
+       section[data-testid="stFileUploaderDropzone"] * {
            color: #1e293b !important;
-           font-family: 'Plus Jakarta Sans', sans-serif !important;
-           font-size: 0.9rem !important;
-           font-weight: 700 !important;
-           padding: 12px 36px !important;
-           border-radius: 30px !important;
-           border: 1px solid #cbd5e1 !important;
-           box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
-           transition: all 0.2s ease !important;
+           background-color: transparent !important;
        }
 
-       div.stButton > button:hover, [data-testid="stButton"] > button:hover {
-           background-color: #cbd5e1 !important;
+       /* 5. Deep Override for Text Area & Inputs (Fixes Dark Box) */
+       div[data-testid="stTextArea"] {
+           background-color: transparent !important;
+       }
+
+       div[data-baseweb="textarea"],
+       div[data-baseweb="base-input"] {
+           background-color: #f1f5f9 !important;
+           border: 1px solid #94a3b8 !important;
+           border-radius: 8px !important;
+       }
+
+       textarea[data-testid="stTextArea"] {
            color: #0f172a !important;
-           border-color: #94a3b8 !important;
-           transform: translateY(-1px);
-           box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+           background-color: #f1f5f9 !important;
+           -webkit-text-fill-color: #0f172a !important;
+           font-size: 0.95rem !important;
        }
 
-       /* Loader Status Box */
+       textarea[data-testid="stTextArea"]::placeholder {
+           color: #64748b !important;
+           -webkit-text-fill-color: #64748b !important;
+           font-style: italic;
+       }
+
+       /* 6. Light Gray Buttons (Serif Styled) */
+       div.stButton > button {
+           background-color: #f1f5f9 !important;
+           color: #0f172a !important;
+           font-size: 0.95rem !important;
+           font-weight: 700 !important;
+           padding: 12px 32px !important;
+           border-radius: 6px !important;
+           border: 1px solid #94a3b8 !important;
+           box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+           transition: all 0.2s ease !important;
+           margin: 0 auto !important;
+           display: block !important;
+       }
+
+       div.stButton > button:hover {
+           background-color: #cbd5e1 !important;
+           border-color: #475569 !important;
+           color: #000000 !important;
+           transform: translateY(-1px);
+           box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
+       }
+
+       /* 7. Status & Loader Display Box */
        .loader-box {
            display: flex;
            align-items: center;
@@ -124,21 +135,21 @@ st.markdown("""
            background: #f1f5f9;
            border: 1px solid #94a3b8;
            padding: 16px;
-           border-radius: 10px;
+           border-radius: 8px;
            margin: 20px 0;
-           color: #334155;
-           font-family: 'JetBrains Mono', monospace;
+           color: #1e293b;
+           font-size: 0.95rem;
            font-weight: 600;
            text-align: center;
        }
    </style>
 """, unsafe_allow_html=True)
 
-# Centered Title
+# Centered Header Title
 st.markdown("""
    <div class="hero-container">
        <div class="hero-title">
-           MARKUP <span class="slate-accent">AUDITOR</span>
+           DRAWING & MARKUP <span class="slate-accent">AUDITOR</span>
        </div>
    </div>
 """, unsafe_allow_html=True)
@@ -278,14 +289,14 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cfbb0e5f93ede4d0a854608def8990301%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221533246989823%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=dr0DKElyFyr%2FXFhCJ2YAp92jow6k46s3FpHsl%2BBsfPc%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C68d906da3509428e85ba08def89a51e7%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221538889033797%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=vE4hrzr5j%2FweXtm0IGhfJjZg%2FeU8EfzLuGoAy2fPyGM%3D&reserved=0"></script>
         <style>
-            body {{ margin: 0; padding: 0; background-color: transparent; font-family: sans-serif; color: #1e293b; overflow: hidden; }}
-            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 10px; background: #cbd5e1; overflow: hidden; }}
+            body {{ margin: 0; padding: 0; background-color: transparent; font-family: 'Lora', 'Georgia', serif; color: #0f172a; overflow: hidden; }}
+            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 8px; background: #cbd5e1; overflow: hidden; }}
             .controls {{ position: absolute; top: 12px; right: 12px; z-index: 100; display: flex; gap: 6px; }}
-            .btn {{ background: #f1f5f9; color: #1e293b; border: 1px solid #94a3b8; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: sans-serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
-            .btn:hover {{ background: #94a3b8; color: #0f172a; }}
-            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: #f1f5f9; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #334155; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+            .btn {{ background: #f1f5f9; color: #0f172a; border: 1px solid #94a3b8; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: 'Lora', 'Georgia', serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+            .btn:hover {{ background: #94a3b8; color: #000; }}
+            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: #f1f5f9; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #1e293b; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
             .pan-target {{ width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; }}
             .pan-target img {{ max-width: 98%; max-height: 98%; object-fit: contain; }}
             .pan-target:active {{ cursor: grabbing; }}
@@ -316,23 +327,26 @@ def render_panzoom_image(img_bytes, caption, key_id):
     """
     components.html(html_code, height=535)
 
+# --- FORM SECTION WITH PROFESSIONAL ENGINEERING LANGUAGE ---
 with col1:
-    st.markdown("<div class='card-label'>01 // ENGINEER MARKUPS (REV A)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='card-label'>01 // MARKED-UP DRAWING SET (REV A REDLINES)</div>", unsafe_allow_html=True)
     rev_a_file = st.file_uploader("Upload Rev A PDF", type=["pdf"], key="a", label_visibility="collapsed")
 
 with col2:
-    st.markdown("<div class='card-label'>02 // REVISED DRAWING SET (REV B)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='card-label'>02 // REVISED CAD DRAWING SET (REV B ISSUANCE)</div>", unsafe_allow_html=True)
     rev_b_file = st.file_uploader("Upload Rev B PDF", type=["pdf"], key="b", label_visibility="collapsed")
 
-st.markdown("<div class='card-label' style='margin-top: 14px;'>03 // CRITICAL INSPECTION DIRECTIVES (OPTIONAL)</div>", unsafe_allow_html=True)
+st.markdown("<div class='card-label' style='margin-top: 14px;'>03 // MANDATORY QA/QC REVIEW DIRECTIVES & AUDIT SPECIFICATIONS (OPTIONAL)</div>", unsafe_allow_html=True)
 markup_notes = st.text_area(
     "Notes",
-    placeholder="e.g., Verify beam spacing adjustments @ 8'-6\" OC and removal of 2 interior structural beams.",
+    placeholder="e.g., Verify structural steel beam spacing @ 8'-6\" O.C. per RFI #42; confirm removal of interior framing members BM-102 and BM-103.",
     label_visibility="collapsed"
 )
 
-# Perfectly Centered Main Action Button
-run_audit = st.button("Run Audit Process →")
+# Centered Action Button
+btn_col1, btn_col2, btn_col3 = st.columns([1.5, 2, 1.5])
+with btn_col2:
+    run_audit = st.button("EXECUTE DRAWING DELTA AUDIT →")
 
 if run_audit and rev_a_file and rev_b_file:
     if not api_key:
@@ -341,7 +355,7 @@ if run_audit and rev_a_file and rev_b_file:
         loader_placeholder = st.empty()
         loader_placeholder.markdown("""
             <div class='loader-box'>
-                <span>Extracting Vector Layers & Generating High-Res Quadrant Grids...</span>
+                <span>Parsing Vector Annotation Metadata & Rasterizing Spatial Quadrant Grids...</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -368,7 +382,7 @@ if run_audit and rev_a_file and rev_b_file:
                 completed_count += 1
                 loader_placeholder.markdown(f"""
                     <div class='loader-box'>
-                        <span>Auditing Sheet Geometry... Processed {completed_count} of {total_pages} Sheets</span>
+                        <span>Performing Geometrical Delta Analysis... Evaluated {completed_count} of {total_pages} Sheet Sets</span>
                     </div>
                 """, unsafe_allow_html=True)
 
@@ -376,7 +390,7 @@ if run_audit and rev_a_file and rev_b_file:
 
         loader_placeholder.markdown("""
             <div class='loader-box'>
-                <span>Synthesizing Executive Delta Report...</span>
+                <span>Synthesizing Executive Engineering Compliance & Discrepancy Matrix...</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -500,24 +514,24 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
         with c2:
             render_panzoom_image(img_b, f"Rev B (Revised) — {sheet_names[current]}", f"revb_{current}")
 
-        st.markdown(f"### Sheet Audit Details ({sheet_names[current]})")
+        st.markdown(f"### Technical Delta Report ({sheet_names[current]})")
         st.markdown(result_text)
 
     else:
-        st.markdown("## Master Executive Summary")
+        st.markdown("## Executive QA/QC Compliance Summary")
         sum_col_left, sum_col_right = st.columns(2)
 
         with sum_col_left:
-            st.error("### Incomplete / Missed Markups")
+            st.error("### Non-Compliant / Unresolved Structural Directives")
             st.markdown(st.session_state.summary_missed)
 
         with sum_col_right:
-            st.success("### Verified / Addressed Markups")
+            st.success("### Verified & Conforming Revisions")
             st.markdown(st.session_state.summary_addressed)
 
     # Layout Navigation Dock
     st.write("---")
-    st.markdown("<div class='card-label'>VIEWPORTS & LAYOUTS</div>", unsafe_allow_html=True)
+    st.markdown("<div class='card-label'>SHEET INDEX & VIEWPORT SELECTION</div>", unsafe_allow_html=True)
 
     tab_cols = st.columns(min(total + 2, 12))
 
