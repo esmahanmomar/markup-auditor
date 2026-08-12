@@ -8,87 +8,120 @@ import time
 from PIL import Image, ImageEnhance
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-st.set_page_config(page_title="MARKUP AUDITOR", layout="wide")
+st.set_page_config(page_title="Markup Auditor | QA/QC Engine", layout="wide", initial_sidebar_state="expanded")
 
-# CSS Styling - Clean Light Background with Civil3D Style Tab Dock & Textarea Fix
+# --- ENTERPRISE UI STYLING (CSS) ---
 st.markdown("""
    <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DDM%2BSans%3Awght%40400%3B500%3B700%26family%3DJetBrains%2BMono%3Awght%40400%3B600%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C2bb220ba713f408b04d908def882da97%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221438063703743%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=7rSmQGCWLK%2Bl3i6AYJXunoPgsEoo27HOdhG8K90tBCs%3D&reserved=0');
+       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DInter%3Awght%40400%3B500%3B600%3B700%26family%3DJetBrains%2BMono%3Awght%40400%3B500%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cb1d21eacce514a3c47ea08def88c5203%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221478725437719%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=Hdq1IwZRr1To57fLEc7134YM1p%2BgCZ4tVLIX5t0AP1U%3D&reserved=0');
 
        html, body, .stApp {
-           background-color: #f4f5f7;
-           color: #1c1e21;
-           font-family: 'DM Sans', sans-serif !important;
+           background-color: #0f172a !important;
+           color: #e2e8f0 !important;
+           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
        }
 
-       .centered-title {
-           text-align: center;
-           font-size: 2.6rem;
+       /* Top Header Branding */
+       .brand-header {
+           background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+           border: 1px solid #334155;
+           border-radius: 12px;
+           padding: 24px 32px;
+           margin-bottom: 24px;
+           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+       }
+
+       .brand-title {
+           font-size: 2rem;
            font-weight: 700;
-           color: #1a1a1a;
-           margin: 5px 0;
-           letter-spacing: -0.5px;
+           color: #f8fafc;
+           letter-spacing: -0.02em;
+           margin: 0;
+           display: flex;
+           align-items: center;
+           gap: 12px;
        }
 
-       .centered-subtitle {
-           text-align: center;
-           font-size: 1.05rem;
-           color: #555555;
-           margin-bottom: 20px;
+       .brand-subtitle {
+           font-size: 0.95rem;
+           color: #94a3b8;
+           margin-top: 6px;
+           font-weight: 400;
        }
 
-       /* Textarea contrast and background fix */
+       /* Input Containers */
        div[data-testid="stFileUploader"], div.stTextArea {
-           background-color: #ffffff !important;
-           border-radius: 8px;
-           padding: 12px;
-           border: 1px solid #e0e0e0;
-           box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+           background-color: #1e293b !important;
+           border: 1px solid #334155 !important;
+           border-radius: 8px !important;
+           padding: 16px !important;
+           box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
        }
 
        div[data-baseweb="textarea"] textarea {
-           color: #111827 !important;
-           background-color: #ffffff !important;
+           color: #f8fafc !important;
+           background-color: #0f172a !important;
+           border: 1px solid #334155 !important;
+           border-radius: 6px !important;
+           font-family: 'Inter', sans-serif !important;
        }
 
-       div[data-baseweb="textarea"] {
-           background-color: #ffffff !important;
-       }
-
+       /* Buttons */
        .stButton>button {
-           background-color: #2b2d42 !important;
+           background-color: #2563eb !important;
            color: #ffffff !important;
-           font-size: 14px !important;
-           font-weight: 600;
-           padding: 8px 12px;
+           font-size: 0.875rem !important;
+           font-weight: 600 !important;
+           padding: 10px 20px !important;
            border-radius: 6px !important;
            border: none !important;
-           box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-           transition: all 0.2s ease-in-out;
+           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+           transition: all 0.15s ease-in-out;
        }
 
        .stButton>button:hover {
-           background-color: #3d405b !important;
+           background-color: #1d4ed8 !important;
+           box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
        }
 
+       /* Loader Box */
        .loader-box {
            display: flex;
            align-items: center;
            justify-content: center;
-           gap: 15px;
-           background-color: #ffffff;
-           border: 1px solid #e0e0e0;
-           padding: 18px;
+           gap: 16px;
+           background-color: #1e293b;
+           border: 1px solid #334155;
+           padding: 20px;
            border-radius: 8px;
            margin: 20px 0;
-           box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+           color: #38bdf8;
+           font-weight: 500;
+       }
+
+       /* Custom CAD Layout Tab Dock */
+       .cad-dock-label {
+           font-family: 'JetBrains Mono', monospace;
+           font-size: 0.75rem;
+           font-weight: 600;
+           letter-spacing: 0.05em;
+           color: #64748b;
+           text-transform: uppercase;
+           margin-bottom: 8px;
        }
    </style>
 """, unsafe_allow_html=True)
 
-# Centered Header
-st.markdown("<h1 class='centered-title'>👷 MARKUP AUDITOR</h1>", unsafe_allow_html=True)
-st.markdown("<p class='centered-subtitle'>🛠️ AI QA/QC Structural & Civil Drawing Markup Verification</p>", unsafe_allow_html=True)
+# Executive Header Component
+st.markdown("""
+   <div class="brand-header">
+       <div class="brand-title">
+           <span>MARKUP AUDITOR</span>
+           <span style="font-size: 0.75rem; background: #3b82f6; color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: 600; vertical-align: middle;">ENTERPRISE</span>
+       </div>
+       <div class="brand-subtitle">Automated Engineering Drawing QA/QC & Redline Delta Verification Engine</div>
+   </div>
+""", unsafe_allow_html=True)
 
 # Safe API Key Fetching
 api_key = None
@@ -225,14 +258,14 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C2bb220ba713f408b04d908def882da97%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221438063749730%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=CHq2toBOAUK1yQ9rUP%2FaIDOR66KIR1mxm16w9cV0J7c%3D&reserved=0"></script>
+        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7Cb1d21eacce514a3c47ea08def88c5203%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221478725572820%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=kgltt3ImqkdsegYSrPzQVeXdIxqQF2j8qwN9Pd%2B%2Fnog%3D&reserved=0"></script>
         <style>
-            body {{ margin: 0; padding: 0; background-color: #111; font-family: sans-serif; color: #ffffff; overflow: hidden; }}
-            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #ccc; border-radius: 6px; background: #000; overflow: hidden; }}
-            .controls {{ position: absolute; top: 10px; right: 10px; z-index: 100; display: flex; gap: 6px; }}
-            .btn {{ background: #2b2d42; color: #fff; border: 1px solid #555; padding: 5px 9px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }}
-            .btn:hover {{ background: #3d405b; }}
-            .caption {{ position: absolute; bottom: 8px; left: 10px; z-index: 100; background: rgba(0,0,0,0.8); padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #007acc; border: 1px solid #333; }}
+            body {{ margin: 0; padding: 0; background-color: #0f172a; font-family: sans-serif; color: #ffffff; overflow: hidden; }}
+            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #334155; border-radius: 8px; background: #020617; overflow: hidden; }}
+            .controls {{ position: absolute; top: 12px; right: 12px; z-index: 100; display: flex; gap: 6px; }}
+            .btn {{ background: #1e293b; color: #f8fafc; border: 1px solid #475569; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }}
+            .btn:hover {{ background: #334155; }}
+            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: rgba(15, 23, 42, 0.9); padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #38bdf8; border: 1px solid #334155; }}
             .pan-target {{ width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; }}
             .pan-target img {{ max-width: 98%; max-height: 98%; object-fit: contain; }}
             .pan-target:active {{ cursor: grabbing; }}
@@ -242,9 +275,9 @@ def render_panzoom_image(img_bytes, caption, key_id):
         <div class="container">
             <div class="caption">{caption}</div>
             <div class="controls">
-                <button class="btn" id="zoom-in-{key_id}">➕ Zoom In</button>
-                <button class="btn" id="zoom-out-{key_id}">➖ Zoom Out</button>
-                <button class="btn" id="reset-{key_id}">🔄 Reset</button>
+                <button class="btn" id="zoom-in-{key_id}">Zoom In</button>
+                <button class="btn" id="zoom-out-{key_id}">Zoom Out</button>
+                <button class="btn" id="reset-{key_id}">Reset</button>
             </div>
             <div class="pan-target" id="pan-target-{key_id}">
                 <img id="img-{key_id}" src="data:image/png;base64,{b64_img}" />
@@ -264,27 +297,29 @@ def render_panzoom_image(img_bytes, caption, key_id):
     components.html(html_code, height=535)
 
 with col1:
-    st.subheader("1. Engineer Callouts / Markups (Rev A)")
-    rev_a_file = st.file_uploader("Upload Rev A PDF (with Markups)", type=["pdf"], key="a")
+    st.markdown("<p style='font-weight: 600; color: #94a3b8; font-size: 0.9rem;'>1. ENGINEER MARKUPS (REV A)</p>", unsafe_allow_html=True)
+    rev_a_file = st.file_uploader("Upload Rev A PDF", type=["pdf"], key="a", label_visibility="collapsed")
 
 with col2:
-    st.subheader("2. Revised Drawing (Rev B)")
-    rev_b_file = st.file_uploader("Upload Rev B PDF", type=["pdf"], key="b")
+    st.markdown("<p style='font-weight: 600; color: #94a3b8; font-size: 0.9rem;'>2. REVISED DRAWING SET (REV B)</p>", unsafe_allow_html=True)
+    rev_b_file = st.file_uploader("Upload Rev B PDF", type=["pdf"], key="b", label_visibility="collapsed")
 
+st.markdown("<p style='font-weight: 600; color: #94a3b8; font-size: 0.9rem; margin-top: 10px;'>AUDIT DIRECTIVES & CRITICAL AREAS (OPTIONAL)</p>", unsafe_allow_html=True)
 markup_notes = st.text_area(
-    "Specific Areas / Notes to Check (Optional):",
-    placeholder="e.g., Focus on beam spacing adjustments @ 8'-6\" OC and removal of 2 interior beams."
+    "Notes",
+    placeholder="e.g., Verify beam spacing adjustments @ 8'-6\" OC and removal of 2 interior structural beams.",
+    label_visibility="collapsed"
 )
 
-if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
+st.write("")
+if st.button("RUN AUDIT & VERIFICATION PROCESS") and rev_a_file and rev_b_file:
     if not api_key:
-        st.error("Please enter your OpenAI API key in the sidebar or Streamlit Secrets.")
+        st.error("Missing API Key: Enter your OpenAI Key in the sidebar or Streamlit secrets.")
     else:
         loader_placeholder = st.empty()
         loader_placeholder.markdown("""
             <div class='loader-box'>
-                <span style='font-size: 2rem;'>👷</span>
-                <span style='font-weight: 600; color: #333;'>DISSECTING DRAWINGS... Extracting annotation layers & tiling visual grids...</span>
+                <span>Extracting Annotation Layers & Generating Quadrant Grids...</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -311,8 +346,7 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
                 completed_count += 1
                 loader_placeholder.markdown(f"""
                     <div class='loader-box'>
-                        <span style='font-size: 2rem;'>🛠️</span>
-                        <span style='font-weight: 600; color: #333;'>AUDIT IN PROGRESS... Processed {completed_count} of {total_pages} sheets...</span>
+                        <span>Auditing Sheet Geometry... Processed {completed_count} of {total_pages} sheets</span>
                     </div>
                 """, unsafe_allow_html=True)
 
@@ -320,8 +354,7 @@ if st.button("👷 AUDIT CALLOUTS & MARKUPS") and rev_a_file and rev_b_file:
 
         loader_placeholder.markdown("""
             <div class='loader-box'>
-                <span style='font-size: 2rem;'>📋</span>
-                <span style='font-weight: 600; color: #333;'>SYNTHESIZING EXECUTIVE REMEDIAL LIST...</span>
+                <span>Synthesizing Executive Action Items...</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -422,9 +455,9 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
             st.rerun()
 
     with nav_col2:
-        curr_label = sheet_names[current] if current < total else "Master QA/QC Action List"
+        curr_label = sheet_names[current] if current < total else "Master QA/QC Executive Summary"
         st.markdown(
-            f"<h3 style='text-align: center; margin: 0; color: #1a1a1a;'>{curr_label} ({current + 1} of {total + 1})</h3>",
+            f"<h3 style='text-align: center; margin: 0; color: #f8fafc; font-size: 1.25rem;'>{curr_label} ({current + 1} of {total + 1})</h3>",
             unsafe_allow_html=True
         )
 
@@ -445,41 +478,40 @@ if "audit_results" in st.session_state and len(st.session_state.audit_results) >
         with c2:
             render_panzoom_image(img_b, f"Rev B (Revised) — {sheet_names[current]}", f"revb_{current}")
 
-        st.markdown(f"### 📋 Detailed Engineering Delta Audit ({sheet_names[current]})")
+        st.markdown(f"### Detailed Engineering Delta Audit ({sheet_names[current]})")
         st.markdown(result_text)
 
     else:
-        st.markdown("## 📋 MASTER QA/QC REMEDIAL ACTION LIST")
+        st.markdown("## Master QA/QC Executive Summary")
         sum_col_left, sum_col_right = st.columns(2)
 
         with sum_col_left:
-            st.error("### ❌ Missed / Incomplete Revisions")
+            st.error("### Incomplete / Missed Markups")
             st.markdown(st.session_state.summary_missed)
 
         with sum_col_right:
-            st.success("### ✅ Fully Addressed Markups")
+            st.success("### Verified / Addressed Markups")
             st.markdown(st.session_state.summary_addressed)
 
-    # Civil3D Layout Tabs Dock Bar
+    # CAD Layout Navigation Dock
     st.write("---")
-    st.markdown("<p style='font-family: monospace; font-weight: 700; color: #333; margin-bottom: 5px;'>📐 CIVIL3D LAYOUT TABS</p>", unsafe_allow_html=True)
+    st.markdown("<div class='cad-dock-label'>CAD VIEWPORTS & LAYOUT TABS</div>", unsafe_allow_html=True)
 
     tab_cols = st.columns(min(total + 2, 12))
 
-    # Model Tab
     with tab_cols[0]:
-        st.button("Model", key="c3d_model", disabled=True)
+        st.button("Model Space", key="c3d_model", disabled=True)
 
     for idx in range(total):
         col_target = tab_cols[(idx + 1) % min(total + 2, 12)]
         with col_target:
-            tab_label = f"🟦 {sheet_names[idx]}" if idx == current else f"{sheet_names[idx]}"
+            tab_label = f"• {sheet_names[idx]}" if idx == current else f"{sheet_names[idx]}"
             if st.button(tab_label, key=f"c3d_tab_{idx}"):
                 st.session_state.current_slide = idx
                 st.rerun()
 
     with tab_cols[(total + 1) % min(total + 2, 12)]:
-        summary_label = "🟦 Summary" if current == total else "Summary"
+        summary_label = "• Summary" if current == total else "Summary"
         if st.button(summary_label, key="c3d_tab_summary"):
             st.session_state.current_slide = total
             st.rerun()
