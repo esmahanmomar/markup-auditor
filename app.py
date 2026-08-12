@@ -14,36 +14,40 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# --- SERIF TYPOGRAPHY & CLEAN NATIVE STREAMLIT UPLOADER ---
+# --- STRICT PURE LIGHT THEME & UI CSS OVERRIDES ---
 st.markdown(
     """
    <style>
-       @import url('https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Ffonts.googleapis.com%2Fcss2%3Ffamily%3DLora%3Aital%2Cwght%400%2C400..700%3B1%2C400..700%26display%3Dswap&data=05%7C02%7Ceomar%40cumminscederberg.com%7C9c685c354605436cb5cc08def89e5c68%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221556250436271%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=rXpT0MnJBkpMIRQragRqfutfRadTZ%2Fc660hz0m9RNVg%3D&reserved=0');
+       @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 
-       /* 1. Global Serif Font Override (Excludes Streamlit Icons) */
-       html, body, .stApp, [data-testid="stSidebar"],
-       input, textarea, select, p, h1, h2, h3, h4, h5, h6, label {
+       /* 1. Global Baseline */
+       html, body, .stApp, [data-testid="stSidebar"], 
+       input, textarea, select, p, h1, h2, h3, h4, h5, h6, label, span, div {
            font-family: 'Lora', 'Georgia', 'Times New Roman', serif !important;
        }
 
-       /* 2. Preserve Streamlit Material Icon Fonts */
-       [data-testid="stIconMaterial"],
+       /* 2. Pure Light Background Canvas */
+       html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+           background-color: #f8fafc !important;
+           color: #0f172a !important;
+       }
+
+       header[data-testid="stHeader"] {
+           background-color: #f8fafc !important;
+       }
+
+       /* 3. Preserve Icons */
+       [data-testid="stIconMaterial"], 
        [data-testid="stIcon"],
        [data-baseweb="icon"],
        span[aria-hidden="true"] {
            font-family: "Material Symbols Outlined", sans-serif !important;
        }
 
-       /* 3. Global Ash Gray Canvas */
-       html, body, .stApp, [data-testid="stSidebar"] {
-           background-color: #e2e8f0 !important;
-           color: #0f172a !important;
-       }
-
-       /* 4. Header Title Styling */
+       /* 4. Title Header */
        .hero-container {
            text-align: center;
-           margin: 15px auto 30px auto;
+           margin: 10px auto 25px auto;
            max-width: 850px;
        }
 
@@ -58,7 +62,7 @@ st.markdown(
        }
 
        .slate-accent {
-           color: #475569;
+           color: #64748b;
            font-style: italic;
        }
 
@@ -72,94 +76,113 @@ st.markdown(
            font-family: 'Lora', 'Georgia', serif !important;
        }
 
-       /* 5. FILE UPLOADER (Clean Light Dropzone, Native Streamlit Controls) */
+       /* 5. Pure Light File Uploader Dropzone & Upload Badges */
        [data-testid="stFileUploader"] {
            background-color: transparent !important;
        }
 
        section[data-testid="stFileUploaderDropzone"] {
-           background-color: #f8fafc !important;
-           border: 1.5px dashed #94a3b8 !important;
+           background-color: #ffffff !important;
+           border: 1.5px dashed #cbd5e1 !important;
            border-radius: 8px !important;
            padding: 16px !important;
        }
 
        section[data-testid="stFileUploaderDropzone"]:hover {
-           border-color: #475569 !important;
-           background-color: #ffffff !important;
+           border-color: #64748b !important;
+           background-color: #f1f5f9 !important;
        }
 
-       /* 6. TEXT AREA FIX (Light Ash Gray Input) */
+       section[data-testid="stFileUploaderDropzone"] * {
+           color: #1e293b !important;
+       }
+
+       /* Fix Dark Uploaded File Badge/Pill Background */
+       [data-testid="stFileUploaderFileData"],
+       div[data-testid="stFileUploaderFileData"],
+       [data-testid="stFileUploaderFileName"] {
+           background-color: #f1f5f9 !important;
+           color: #0f172a !important;
+           border: 1px solid #cbd5e1 !important;
+           border-radius: 6px !important;
+       }
+
+       [data-testid="stFileUploaderFileData"] * {
+           color: #0f172a !important;
+       }
+
+       /* 6. Pure Light Text Area */
        [data-testid="stTextArea"] > div,
        [data-testid="stTextArea"] > div > div,
-       div[data-baseweb="textarea"],
+       div[data-baseweb="textarea"], 
        div[data-baseweb="base-input"] {
-           background-color: #f8fafc !important;
-           border: 1px solid #94a3b8 !important;
+           background-color: #ffffff !important;
+           border: 1px solid #cbd5e1 !important;
            border-radius: 8px !important;
        }
 
        textarea[data-testid="stTextArea"] {
            color: #0f172a !important;
-           background-color: #f8fafc !important;
+           background-color: #ffffff !important;
            -webkit-text-fill-color: #0f172a !important;
            font-size: 0.95rem !important;
            font-family: 'Lora', 'Georgia', serif !important;
        }
 
        textarea[data-testid="stTextArea"]::placeholder {
-           color: #64748b !important;
-           -webkit-text-fill-color: #64748b !important;
+           color: #94a3b8 !important;
+           -webkit-text-fill-color: #94a3b8 !important;
            font-style: italic;
-           font-family: 'Lora', 'Georgia', serif !important;
        }
 
-       /* 7. MAIN ACTION BUTTONS */
+       /* 7. Action Button (Left Aligned) */
        div.stButton > button {
-           background-color: #f1f5f9 !important;
+           background-color: #ffffff !important;
            color: #0f172a !important;
            font-size: 0.95rem !important;
            font-weight: 700 !important;
            font-family: 'Lora', 'Georgia', serif !important;
-           padding: 12px 32px !important;
+           padding: 12px 28px !important;
            border-radius: 6px !important;
-           border: 1px solid #94a3b8 !important;
-           box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+           border: 1px solid #cbd5e1 !important;
+           box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
            transition: all 0.2s ease !important;
-           margin: 0 auto !important;
+           margin-left: 0 !important;
+           margin-right: auto !important;
            display: block !important;
        }
 
        div.stButton > button:hover {
-           background-color: #cbd5e1 !important;
-           border-color: #475569 !important;
-           color: #000000 !important;
+           background-color: #e2e8f0 !important;
+           border-color: #64748b !important;
+           color: #0f172a !important;
            transform: translateY(-1px);
-           box-shadow: 0 4px 8px rgba(0,0,0,0.08) !important;
+           box-shadow: 0 4px 6px rgba(0,0,0,0.06) !important;
        }
 
-       /* 8. Status Display Box */
+       /* 8. Loader & Status Box */
        .loader-box {
            display: flex;
            align-items: center;
            justify-content: center;
-           background: #f8fafc;
-           border: 1px solid #94a3b8;
+           background: #ffffff;
+           border: 1px solid #cbd5e1;
            padding: 16px;
            border-radius: 8px;
            margin: 20px 0;
-           color: #1e293b;
+           color: #0f172a;
            font-size: 0.95rem;
            font-weight: 600;
            font-family: 'Lora', 'Georgia', serif !important;
            text-align: center;
+           box-shadow: 0 1px 3px rgba(0,0,0,0.04);
        }
    </style>
 """,
     unsafe_allow_html=True,
 )
 
-# Centered Header Title
+# Header
 st.markdown(
     """
    <div class="hero-container">
@@ -171,7 +194,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Safe API Key Fetching
+# API Key Handling
 api_key = None
 try:
   if "OPENAI_API_KEY" in st.secrets:
@@ -217,6 +240,7 @@ def process_pdf_with_annotations(pdf_file):
     w, h = img.size
     page_crops = []
 
+    # 4 High-Res Quadrants for visual optical comparison
     quadrants = [
         (0, 0, int(w * 0.55), int(h * 0.55)),
         (int(w * 0.45), 0, w, int(h * 0.55)),
@@ -261,15 +285,17 @@ def process_single_sheet(
       annot_summary += f"- Redline #{idx+1} ({a['type']}): \"{txt}\" (Subject: {a['subject']})\n"
   else:
     annot_summary = (
-        "\nNO EMBEDDED PDF VECTOR ANNOTATIONS DETECTED ON SHEET"
-        f" {sheet_index+1}.\n"
+        "\nNO EMBEDDED PDF VECTOR ANNOTATIONS DETECTED ON METADATA LAYER. YOU"
+        " MUST PERFORM FULL VISUAL OPTICAL COMPARISON ACROSS CROPS TO DETECT"
+        " REDLINES AND TEXT EDITS.\n"
     )
 
   content_payload = [{
       "type": "text",
       "text": (
           f"User Specific Directives: {user_notes}\n{annot_summary}\nCompare"
-          f" Sheet {sheet_index+1} Rev A against Rev B."
+          f" Sheet {sheet_index+1} Rev A against Rev B thoroughly across text"
+          " labels, dimensions, and drawing lines."
       ),
   }]
 
@@ -321,23 +347,24 @@ def process_single_sheet(
 
   system_prompt = (
       f"You are a Senior Structural & Civil Engineering QA/QC Inspector auditing"
-      f" Sheet {sheet_index+1}.\n\nSTRICT AUDIT & SHEET ISOLATION"
-      f" RULES:\n1. Evaluate ONLY Sheet {sheet_index+1}. DO NOT"
-      " cross-reference or invent directives from other sheets or previous"
-      " drawings.\n2. Check the EXTRACTED VECTOR ANNOTATIONS layer provided"
-      " above for this specific sheet.\n3. IF NO REDLINES OR ANNOTATIONS EXIST"
-      " ON THIS SHEET (in metadata or visually), YOU MUST SET STATUS TO 'NO"
-      " MARKUPS DETECTED ON THIS SHEET' AND DO NOT INVENT CALLOUTS.\n4. If"
-      " markups exist, evaluate physical CAD drafting execution in Rev B.\n5."
-      " Read the Title Block on the bottom right of the image to state the"
-      " true Sheet Number (e.g., CM-1.0, CM-1.1).\n\nFORMAT YOUR OUTPUT EXACTLY"
-      " AS FOLLOWS:\n\n### Engineering Callout & Design Delta Audit\n\n*"
+      f" Sheet {sheet_index+1}.\n\nSTRICT COMPREHENSIVE AUDIT & VISUAL DIFF"
+      " RULES:\n1. Evaluate ONLY Sheet {sheet_index+1}.\n2. Perform a"
+      " meticulous visual optical scan comparing Rev A and Rev B across all 4"
+      " quadrant crops. Check for altered text notes (e.g. 'SEAWALL' changed to"
+      " 'CENTER OF ROAD'), moved alignment lines, updated dimensions, and"
+      " added/removed graphic callouts.\n3. Do not rely solely on embedded PDF"
+      " metadata. Scan the image pixels directly for redlines, clouding, and"
+      " text edits.\n4. Read the Title Block on the bottom right to report the"
+      " exact Sheet Number (e.g., CM-1.0, CM-1.3).\n\nFORMAT YOUR OUTPUT"
+      " EXACTLY AS FOLLOWS:\n\n### Engineering Callout & Design Audit\n\n*"
       " **Location & Drawing Ref**: [Grid Lines / Detail Ref / Title Block"
-      " Sheet Number]\n  * **Engineer Redline Directive**: [Exact directive on"
-      " THIS sheet, or 'None']\n  * **Rev B Visual Geometry Verification**:"
-      " [Observed physical CAD changes in Rev B]\n  * **Status**: FULLY"
-      " ADDRESSED (or MISSED / PARTIALLY ADDRESSED / NO MARKUPS DETECTED ON"
-      " THIS SHEET)\n  * **QA/QC Technical Notes**: [Technical notes]\n"
+      " Sheet Number]\n  * **Engineer Redline Directive**: [Exact directive /"
+      " question visible on Rev A or in redlines]\n  * **Rev B Visual"
+      " Geometry Verification**: [Observed physical CAD changes in Rev B,"
+      " including exact text modifications]\n  * **Status**: FULLY ADDRESSED"
+      " (or MISSED / PARTIALLY ADDRESSED / NO MARKUPS DETECTED ON THIS"
+      " SHEET)\n  * **QA/QC Technical Notes**: [Detailed technical"
+      " commentary]\n"
   )
 
   max_retries = 5
@@ -367,14 +394,14 @@ def render_panzoom_image(img_bytes, caption, key_id):
     <!DOCTYPE html>
     <html>
     <head>
-        <script src="https://nam02.safelinks.protection.outlook.com/?url=https%3A%2F%2Funpkg.com%2F%40panzoom%2Fpanzoom%404.5.1%2Fdist%2Fpanzoom.min.js&data=05%7C02%7Ceomar%40cumminscederberg.com%7C9c685c354605436cb5cc08def89e5c68%7C9118270b61d6488d8bd6ca11e909b902%7C0%7C0%7C639221556250465006%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=7G8QvdROZBjotjuQzSQyZ9vLlSFanuyaOvVVDy3%2FARE%3D&reserved=0"></script>
+        <script src="https://unpkg.com/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
         <style>
             body {{ margin: 0; padding: 0; background-color: transparent; font-family: 'Lora', 'Georgia', serif; color: #0f172a; overflow: hidden; }}
-            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 8px; background: #cbd5e1; overflow: hidden; }}
+            .container {{ position: relative; width: 100%; height: 520px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; overflow: hidden; }}
             .controls {{ position: absolute; top: 12px; right: 12px; z-index: 100; display: flex; gap: 6px; }}
-            .btn {{ background: #f8fafc; color: #0f172a; border: 1px solid #94a3b8; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: 'Lora', 'Georgia', serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
-            .btn:hover {{ background: #94a3b8; color: #000; }}
-            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: #f8fafc; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #1e293b; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+            .btn {{ background: #f8fafc; color: #0f172a; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: 'Lora', 'Georgia', serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
+            .btn:hover {{ background: #e2e8f0; color: #0f172a; }}
+            .caption {{ position: absolute; bottom: 12px; left: 12px; z-index: 100; background: #f8fafc; padding: 6px 14px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #0f172a; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }}
             .pan-target {{ width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: grab; }}
             .pan-target img {{ max-width: 98%; max-height: 98%; object-fit: contain; }}
             .pan-target:active {{ cursor: grabbing; }}
@@ -406,7 +433,7 @@ def render_panzoom_image(img_bytes, caption, key_id):
   components.html(html_code, height=535)
 
 
-# --- FORM SECTION ---
+# --- UPLOAD SECTION ---
 with col1:
   st.markdown(
       "<div class='card-label'>01 // MARKED-UP DRAWING SET (REV A"
@@ -448,10 +475,8 @@ markup_notes = st.text_area(
     label_visibility="collapsed",
 )
 
-# Centered Action Button
-btn_col1, btn_col2, btn_col3 = st.columns([1.5, 2, 1.5])
-with btn_col2:
-  run_audit = st.button("EXECUTE DRAWING DELTA AUDIT →")
+# Left-Aligned Button with Updated Label
+run_audit = st.button("EXECUTE DRAWING AUDIT")
 
 if run_audit and rev_a_file and rev_b_file:
   if not api_key:
@@ -597,7 +622,7 @@ if run_audit and rev_a_file and rev_b_file:
     st.session_state.summary_missed = missed_summary
     st.session_state.summary_addressed = addressed_summary
 
-# Render Navigation & Layout
+# Navigation & Output Rendering
 if (
     "audit_results" in st.session_state
     and len(st.session_state.audit_results) > 0
@@ -608,7 +633,7 @@ if (
   current = st.session_state.current_slide
   sheet_names = st.session_state.sheet_names
 
-  # Hotkeys
+  # Keyboard Navigation Hotkeys
   components.html(
       """
         <script>
@@ -628,7 +653,7 @@ if (
       width=0,
   )
 
-  # Top Navigation Bar
+  # Top Nav Bar
   nav_col1, nav_col2, nav_col3 = st.columns([1.2, 3, 1.2])
 
   with nav_col1:
@@ -670,7 +695,7 @@ if (
           f"revb_{current}",
       )
 
-    st.markdown(f"### Technical Delta Report ({sheet_names[current]})")
+    st.markdown(f"### Technical Report ({sheet_names[current]})")
     st.markdown(result_text)
 
   else:
@@ -685,7 +710,7 @@ if (
       st.success("### Verified & Conforming Revisions")
       st.markdown(st.session_state.summary_addressed)
 
-  # Layout Navigation Dock
+  # Sheet Navigation Dock
   st.write("---")
   st.markdown(
       "<div class='card-label'>SHEET INDEX & VIEWPORT SELECTION</div>",
